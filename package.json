@@ -7,8 +7,8 @@
 		"clean": "rm -rf dist",
 		"prebuild": "npm run clean && mkdir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-umd": "BABEL_ENV=umd babel src/index.js -o dist/index.umd.js",
-    "build-esm": "BABEL_ENV=esm babel src/index.js -o dist/index.esm.js",
+    "build-umd": "BABEL_ENV=umd babel gitrows.js -o dist/gitrows.umd.js",
+    "build-esm": "BABEL_ENV=esm babel gitrows.js -o dist/gitrows.esm.js",
     "build": "npm run build-umd && npm run build-esm"
   },
   "repository": {
