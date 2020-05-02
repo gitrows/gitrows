@@ -1,11 +1,11 @@
 {
   "name": "gitrows",
   "version": "0.0.5",
-  "description": "Use git repos as CRUD data storage ",
+  "description": "Use git repos as CRUD data storage",
   "main": "gitrows.js",
   "scripts": {
-		"clean": "rm -rf dist",
-		"prebuild": "npm run clean && mkdir dist",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean && mkdir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-umd": "BABEL_ENV=umd babel gitrows.js -o dist/gitrows.umd.js",
     "build-esm": "BABEL_ENV=esm babel gitrows.js -o dist/gitrows.esm.js",
@@ -36,10 +36,10 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-transform-modules-commonjs": "^7.9.0",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-transform-modules-commonjs": "^7.9.6",
     "@babel/plugin-transform-modules-umd": "^7.9.0",
-    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-env": "^7.9.6",
     "babel-preset-github": "^3.2.1"
   }
 }
