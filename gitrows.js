@@ -115,11 +115,14 @@ module.exports=class GITROWS{
 				let data=self.parseContent(t);
 				if (data&&typeof query != 'undefined'){
 					data=GITROWS.where(data,query);
-					if (query['$select']){
-						if (query['$select']!='*'){
-							data=GITROWS._pluck(data,query['$select'].split(',').map(s=>s.trim()));
-						}
-					}
+					let aggregates=Object.keys(query)
+					  .filter(key => key.startsWith('$'))
+					  .reduce((obj, key) => {
+					    obj[key] = query[key];
+					    return obj;
+					  }, {});
+					if(Object.keys(aggregates).length)
+						data=GITROWS._aggregate(data,aggregates);
 				}
 				resolve(data);
 			})
@@ -176,10 +179,11 @@ module.exports=class GITROWS{
 		obj=Object.values(obj);
 		Object.keys(filter).forEach((key) => {
 			if (key.indexOf('$')==0) return;
+			console.log('key',key);
 			let value=filter[key];
 			if (value.indexOf(':')>-1){
 				value=value.split(':');
-				switch (value[0]) {
+				switch (value[0].toLowerCase()) {
 					case 'gt':
 						obj = obj.filter(item=>item[key]!==undefined&&item[key]>value[1]);
 						break;
@@ -194,6 +198,17 @@ module.exports=class GITROWS{
 						break;
 					case 'not':
 						obj = obj.filter(item=>item[key]!==undefined&&item[key]!=value[1]);
+						break;
+					case 'eq':
+						obj = obj.filter(item=>item[key]!==undefined&&item[key]==value[1]);
+						break;
+					case 'startswith':
+					case '^':
+						obj = obj.filter(item=>item[key]!==undefined&&typeof item[key]=='string'&&item[key].startsWith(value[1]));
+						break;
+					case 'endswith':
+					case '$':
+						obj = obj.filter(item=>item[key]!==undefined&&typeof item[key]=='string'&&item[key].endsWith(value[1]));
 						break;
 					default:
 
@@ -300,6 +315,63 @@ module.exports=class GITROWS{
 			}
 		});
 		return result;
+	}
+	static _aggregate(obj,aggregates){
+		let data={},length=0,sum=0;
+		for (let key in aggregates) {
+			let items=aggregates[key]=='*'?'*':aggregates[key].split(',').map(s=>s.trim());
+			switch (key) {
+				case '$select':
+					data=GITROWS._pluck(obj,items);
+					break;
+				case '$count':
+					if (Array.isArray(items))
+						items.forEach((item, i) => {
+							data['count('+item+')']=GITROWS._pluck(obj,item).filter(e=>e.length).length;
+						});
+					else data['count('+items+')']=obj.filter(e=>e).length;
+					break;
+				case '$sum':
+					if (Array.isArray(items))
+						items.forEach((item, i) => {
+							let column=GITROWS._pluck(obj,item);
+							sum=column.reduce((prev, curr) => !isNaN(curr)?prev+(+curr):NaN,0);
+							data['sum('+item+')']=isNaN(sum)?null:sum;
+						});
+					else return;
+					break;
+				case '$avg':
+					if (Array.isArray(items))
+						items.forEach((item, i) => {
+							let column=GITROWS._pluck(obj,item);
+							length=column.filter(e=>e.length).length;
+							sum=column.reduce((prev, curr) => !isNaN(curr)?prev+(+curr):0,0);
+							data['avg('+item+')']=sum!=0?sum/length:null;
+						});
+					else return;
+				case '$min':
+					if (Array.isArray(items))
+						items.forEach((item, i) => {
+							let column=GITROWS._pluck(obj,item);
+							let min=Math.min( ...column);
+							data['min('+item+')']=isNaN(min)?null:min;
+						});
+					else return;
+					break;
+				case '$max':
+					if (Array.isArray(items))
+						items.forEach((item, i) => {
+							let column=GITROWS._pluck(obj,item);
+							let max=Math.max( ...column);
+							data['max('+item+')']=isNaN(max)?null:max;
+						});
+					else return;
+					break;
+				default:
+
+			}
+		}
+		return data;
 	}
 	parseContent(content){
 		let self=this;
