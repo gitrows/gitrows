@@ -298,9 +298,18 @@ module.exports=class GITROWS{
 		return {ns:ns.scope,resource:res.resource,path:res.path,repo:res.repo,tree:res.tree,server:ns.server}
 	}
 	static _parseUrl(url){
-		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>\w+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?(?:blob\/)(?<branch>(?<=blob\/)[\w]+)\/)?(?<path>[\w\/\-\.]+.(?:json|csv))/gm;
+		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>[\w-]+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?(?:blob\/)(?<branch>(?<=blob\/)[\w]+)\/)?(?<path>[\w\/\-\.]+.(?:json|csv))/gm;
 		let result=regex.exec(url);
 		return result.groups;
+	}
+	static _pathFromUrl(url){
+		let data=GITROWS._parseUrl(url);
+		if (!GITROWS._isValidPath(data)) return null;
+		return `@${data.ns}/${data.owner}/${data.repo}/${data.path}`;
+	}
+	static _isValidPath(obj){
+		let mandatory=['ns','owner','repo','path'];
+		return mandatory.every(x=>x in obj);
 	}
 	static _pluck(obj,keys){
 		let returnAsValues=false;
