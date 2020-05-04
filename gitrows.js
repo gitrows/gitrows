@@ -290,9 +290,17 @@ module.exports=class GITROWS{
 		return {resource:res,path:repo+'/'+tree,repo:repo,tree:tree}
 	}
 	static parsePath(path){
+		if (GITROWS._isUrl(path)){
+
+		}
 		let ns=GITROWS._getNamespace(path);
 		let res=GITROWS._getResource(ns.path);
 		return {ns:ns.scope,resource:res.resource,path:res.path,repo:res.repo,tree:res.tree,server:ns.server}
+	}
+	static _parseUrl(url){
+		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>\w+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?blob\/master\/)?(?<path>[\w\/\.]+)/gm;
+		let result=regex.exec(url);
+		return result.groups;
 	}
 	static _pluck(obj,keys){
 		let returnAsValues=false;
@@ -372,6 +380,22 @@ module.exports=class GITROWS{
 			}
 		}
 		return data;
+	}
+	static _isUrl(url){
+		/*
+		*	Taken from https://github.com/kevva/url-regex
+		*	MIT © Kevin Mårtensson and Diego Perini
+		*/
+		const protocol = `(?:(?:[a-z]+:)?//)${options.strict ? '' : '?'}`;
+		const auth = '(?:\\S+(?::\\S*)?@)?';
+		const ip = ipRegex.v4().source;
+		const host = '(?:(?:[a-z\\u00a1-\\uffff0-9][-_]*)*[a-z\\u00a1-\\uffff0-9]+)';
+		const domain = '(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*';
+		const tld = `(?:\\.${options.strict ? '(?:[a-z\\u00a1-\\uffff]{2,})' : `(?:${tlds.sort((a, b) => b.length - a.length).join('|')})`})\\.?`;
+		const port = '(?::\\d{2,5})?';
+		const path = '(?:[/?#][^\\s"]*)?';
+		const regex = `(?:${protocol}|www\\.)${auth}(?:localhost|${ip}|${host}${domain}${tld})${port}${path}`;
+		return RegExp(`(?:^${regex}$)`, 'i').test(url);
 	}
 	parseContent(content){
 		let self=this;
