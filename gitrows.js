@@ -272,6 +272,27 @@ module.exports=class GITROWS{
 		let res=GITROWS._getResource(ns.path);
 		return {ns:ns.scope,resource:res.resource,path:res.path,repo:res.repo,tree:res.tree,server:ns.server}
 	}
+	static _pluck(obj,keys){
+		let returnAsValues=false;
+		if(!Array.isArray(keys)){
+			keys=[keys];
+			returnAsValues=true;
+		}
+		obj=Object.values(obj);
+		let result=[];
+		obj.forEach((item, i) => {
+			result.push({});
+			for (let key in item) {
+				if (~keys.indexOf(key)) {
+					if (returnAsValues)
+						result[i]=item[key];
+					else
+						result[i][key]=item[key];
+				}
+			}
+		});
+		return result;
+	}
 	parseContent(content){
 		let self=this;
 		let data=null;
