@@ -98,7 +98,7 @@ module.exports=class GITROWS{
 		return new Promise(function(resolve, reject) {
 			const parsed=GITROWS.parsePath(path);
 			path=parsed.path;
-			self.ns=parsed.scope||self.ns;
+			self.ns=parsed.ns||self.ns;
 			if (parsed.resource){
 				query=query||{};
 				query.id=parsed.resource;
@@ -113,11 +113,11 @@ module.exports=class GITROWS{
 			)
 			.then(t=>{
 				let data=self.parseContent(t);
-				if (data&&typeof query !== undefined){
+				if (data&&typeof query != 'undefined'){
 					data=GITROWS.where(data,query);
 					if (query['$select']){
 						if (query['$select']!='*'){
-							data=GITROWS._pluck(query['$select'].split(',').map(s=>s.trim()));
+							data=GITROWS._pluck(data,query['$select'].split(',').map(s=>s.trim()));
 						}
 					}
 				}
@@ -154,7 +154,7 @@ module.exports=class GITROWS{
 		return new Promise(function(resolve, reject) {
 			const parsed=GITROWS.parsePath(path);
 			path=parsed.path;
-			self.ns=parsed.scope||self.ns;
+			self.ns=parsed.ns||self.ns;
 			if (parsed.resource)
 				id=parsed.resource;
 			self.pull(path)
@@ -175,8 +175,8 @@ module.exports=class GITROWS{
 		 return [obj[filter.id]];
 		obj=Object.values(obj);
 		Object.keys(filter).forEach((key) => {
+			if (key.indexOf('$')==0) return;
 			let value=filter[key];
-			if (value.indexOf('$')==0) return;
 			if (value.indexOf(':')>-1){
 				value=value.split(':');
 				switch (value[0]) {
