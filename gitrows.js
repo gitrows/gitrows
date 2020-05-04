@@ -113,8 +113,14 @@ module.exports=class GITROWS{
 			)
 			.then(t=>{
 				let data=self.parseContent(t);
-				if (data&&typeof query !== undefined)
+				if (data&&typeof query !== undefined){
 					data=GITROWS.where(data,query);
+					if (query['$select']){
+						if (query['$select']!='*'){
+							data=GITROWS._pluck(query['$select'].split(',').map(s=>s.trim()));
+						}
+					}
+				}
 				resolve(data);
 			})
 			.catch(f=>reject(f));
@@ -170,6 +176,7 @@ module.exports=class GITROWS{
 		obj=Object.values(obj);
 		Object.keys(filter).forEach((key) => {
 			let value=filter[key];
+			if (value.indexOf('$')==0) return;
 			if (value.indexOf(':')>-1){
 				value=value.split(':');
 				switch (value[0]) {
@@ -275,6 +282,7 @@ module.exports=class GITROWS{
 	static _pluck(obj,keys){
 		let returnAsValues=false;
 		if(!Array.isArray(keys)){
+			if (keys=='*') return obj;
 			keys=[keys];
 			returnAsValues=true;
 		}
