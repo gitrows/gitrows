@@ -291,14 +291,14 @@ module.exports=class GITROWS{
 	}
 	static parsePath(path){
 		if (GITROWS._isUrl(path)){
-
+			return GITROWS._parseUrl(path);
 		}
 		let ns=GITROWS._getNamespace(path);
 		let res=GITROWS._getResource(ns.path);
 		return {ns:ns.scope,resource:res.resource,path:res.path,repo:res.repo,tree:res.tree,server:ns.server}
 	}
 	static _parseUrl(url){
-		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>\w+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?blob\/master\/)?(?<path>[\w\/\.]+)/gm;
+		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>\w+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?(?:blob\/)(?<branch>(?<=blob\/)[\w]+)\/)?(?<path>[\w\/\-\.]+.(?:json|csv))/gm;
 		let result=regex.exec(url);
 		return result.groups;
 	}
