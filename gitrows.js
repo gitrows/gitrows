@@ -27,7 +27,7 @@ module.exports=class GITROWS{
 			let headers={};
 			const pathData=GITROWS._parsePath(path);
 			self.options(pathData);
-			if(!GITROWS._isValidPath(self.options())) reject("Can't call api with options: "+JSON.stringify(self.options()));
+			if(!GITROWS._isValidPath(self.options())) reject("400 Can't call api with options: "+JSON.stringify(self.options()));
 			if (self.user!==undefined&&self.token!==undefined&&self.ns=='github')
 				headers["Authorization"]="Basic "+btoa(self.user+":"+self.token);
 			let url=GITROWS._apiFromPath(self.options());
@@ -46,16 +46,14 @@ module.exports=class GITROWS{
 			let self=this;
 			return new Promise(function(resolve, reject) {
 				if (!self.token) reject("403 You must provide an API token to commit")
-				const ns=GITROWS._getNamespace(path);
-				path=ns.path;
-				self.ns=ns.scope||self.ns;
+				const pathData=GITROWS._parsePath(path);
+				self.options(pathData);
+				if(!GITROWS._isValidPath(self.options())) reject("400 Can't commit data with options: "+JSON.stringify(self.options()));
 				let data={
-					"branch":"master"
+					"branch":self.branch
 				};
-				let type=(typeof self.type=='undefined')?GITROWS.getExtension(path):self.type;
-				delete self.type;
 				if (typeof obj!='undefined'&&obj)
-					data.content=btoa(type=='csv'?CSV.stringify(obj,{header:true}):JSON.stringify(obj));
+					data.content=btoa(~self.path.indexOf('.csv')?CSV.stringify(obj,{header:true}):JSON.stringify(obj));
 				if (typeof sha!='undefined')
 					data.sha=sha;
 				let headers={
@@ -74,7 +72,7 @@ module.exports=class GITROWS{
 						data.message=self.message;
 						data.committer=self.author;
 				}
-				let url=GITROWS.buildApiUrl(path,self.ns);
+				let url=GITROWS._apiFromPath(self.options());
 				fetch(url,{
 					method:method,
 					headers: headers,
@@ -93,9 +91,8 @@ module.exports=class GITROWS{
 	}
 	drop(path){
 		let self=this;
-		if (self.ns=='github'){
+		if (self.ns=='github')
 				return self.pull(path).then(d=>self.push(path,null,d.sha,'DELETE'));
-		} else
 		return self.push(path,null,null,'DELETE');
 	}
 	get(path,query){
@@ -107,7 +104,7 @@ module.exports=class GITROWS{
 				query=query||{};
 				query.id=pathData.resource;
 			}
-			if(!GITROWS._isValidPath(self.options())) reject("Can't get data with options: "+JSON.stringify(self.options()));
+			if(!GITROWS._isValidPath(self.options())) reject("400 Can't get data with options: "+JSON.stringify(self.options()));
 			const url=GITROWS._urlFromPath(self.options(),true);
 			fetch(url)
 			.then(
@@ -160,12 +157,11 @@ module.exports=class GITROWS{
 	delete(path,id){
 		let self=this,base=[];
 		return new Promise(function(resolve, reject) {
-			const parsed=GITROWS._parsePath(path);
-			path=parsed.path;
-			self.ns=parsed.ns||self.ns;
-			if (parsed.resource)
-				id=parsed.resource;
-			self.pull(path)
+			const pathData=GITROWS._parsePath(path);
+			self.options(pathData);
+			if (pathData.resource&&typeof id=='undefined')
+				id=pathData.resource;
+			self.pull(pathData)
 			.then(
 				d=>{
 					base=self.parseContent(atob(d.content));
@@ -179,8 +175,14 @@ module.exports=class GITROWS{
 	}
 	static where(obj,filter){
 		if (typeof filter=='undefined'||Object.keys(filter).length==0) return obj;
-		if(obj.constructor !== Array && typeof filter.id!='undefined')
-		 return [obj[filter.id]];
+		if(obj.constructor !== Array && typeof filter.id!='undefined'){
+			if (!~filter.id.indexOf('not:'))
+				return [obj[filter.id]];
+			else {
+				delete obj[filter.id.split(':').pop()];
+				return obj;
+			}
+		}
 		obj=Object.values(obj);
 		Object.keys(filter).forEach((key) => {
 			if (key.indexOf('$')==0) return;
@@ -222,25 +224,8 @@ module.exports=class GITROWS{
 		});
 		return obj;
 	}
-	static buildApiUrl(path,ns,type){
-		if (typeof path===undefined||path.indexOf('/')==-1)
-			return false;
-		let parts=path.split('/').filter(x=>x);
-		let url='',server='';
-		let extension='.'+(type||GITROWS.getExtension(path));
-		if (path.indexOf(extension)>-1) extension='';
-		switch (ns) {
-			case 'gitlab':
-			  server=this.server||'gitlab.com';
-				url='https://'+server+'/api/v4/projects/'+encodeURIComponent(parts.shift()+'/'+parts.shift())+'/repository/files/'+encodeURIComponent(parts.join('/')+extension);
-				break;
-			default:
-				server=this.server||'api.github.com';
-				url='https://'+server+'/repos/'+parts.shift()+'/'+parts.shift()+'/contents/'+parts.join('/')+extension;
-		}
-		return url;
-	}
 	static _parsePath(path){
+		if (typeof path=='object') return path;
 		if (GITROWS._isUrl(path)){
 			return GITROWS._parseUrl(path);
 		}
@@ -397,7 +382,7 @@ module.exports=class GITROWS{
 	}
 	options(obj){
 		let self=this;
-		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv'];
+		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv','type'];
 		if (typeof obj=='undefined'){
 			let data={};
 			allowed.forEach((item, i) => {
