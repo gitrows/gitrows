@@ -2,6 +2,7 @@ const fetch=require('node-fetch');
 const base64=require('base-64');
 const atob=base64.decode;
 const btoa=base64.encode;
+
 const CSV = {
 	parse:require('csv-parse/lib/sync'),
 	stringify: require('csv-stringify/lib/sync')
@@ -9,6 +10,8 @@ const CSV = {
 
 module.exports=class GITROWS{
 	constructor(options){
+		this.ns='github';
+		this.branch='master'
 		this.message='GitRows API Post (https://gitrows.com)';
 		this.author={name:"GitRows",email:"api@gitrows.com"};
 		this.csv={delimiter:","};
@@ -22,12 +25,13 @@ module.exports=class GITROWS{
 		let self=this;
 		return new Promise(function(resolve, reject) {
 			let headers={};
-			const ns=GITROWS._getNamespace(path);
-			path=ns.path;
-			self.ns=ns.scope||self.ns;
-			if (self.owner!==undefined&&self.token!==undefined)
-				headers["Authorization"]="Basic "+btoa(self.owner+":"+self.token);
-			let url=GITROWS.buildApiUrl(path,self.ns);
+			const pathData=GITROWS._parsePath(path);
+			self.options(pathData);
+			if(!GITROWS._isValidPath(self.options())) reject("Can't call api with options: "+JSON.stringify(self.options()));
+			if (self.user!==undefined&&self.token!==undefined&&self.ns=='github')
+				headers["Authorization"]="Basic "+btoa(self.user+":"+self.token);
+			let url=GITROWS._apiFromPath(self.options());
+			if (self.ns=='gitlab') url+="?ref="+self.branch;
 			fetch(url,{
 				headers: headers,
 			})
@@ -41,6 +45,7 @@ module.exports=class GITROWS{
 	push(path,obj,sha,method='PUT'){
 			let self=this;
 			return new Promise(function(resolve, reject) {
+				if (!self.token) reject("403 You must provide an API token to commit")
 				const ns=GITROWS._getNamespace(path);
 				path=ns.path;
 				self.ns=ns.scope||self.ns;
@@ -65,7 +70,7 @@ module.exports=class GITROWS{
 						data.author_email=self.author.email;
 						break;
 					default:
-						headers['Authorization']="Basic " + btoa(self.owner + ":" + self.token);
+						headers['Authorization']="Basic " + btoa(self.user + ":" + self.token);
 						data.message=self.message;
 						data.committer=self.author;
 				}
@@ -96,14 +101,14 @@ module.exports=class GITROWS{
 	get(path,query){
 		let self=this;
 		return new Promise(function(resolve, reject) {
-			const parsed=GITROWS.parsePath(path);
-			path=parsed.path;
-			self.ns=parsed.ns||self.ns;
-			if (parsed.resource){
+		  const pathData=GITROWS._parsePath(path);
+			self.options(pathData);
+			if (pathData.resource){
 				query=query||{};
-				query.id=parsed.resource;
+				query.id=pathData.resource;
 			}
-			let url=GITROWS.buildStaticUrl(path,self.ns);
+			if(!GITROWS._isValidPath(self.options())) reject("Can't get data with options: "+JSON.stringify(self.options()));
+			const url=GITROWS._urlFromPath(self.options(),true);
 			fetch(url)
 			.then(
 				r=>{
@@ -155,7 +160,7 @@ module.exports=class GITROWS{
 	delete(path,id){
 		let self=this,base=[];
 		return new Promise(function(resolve, reject) {
-			const parsed=GITROWS.parsePath(path);
+			const parsed=GITROWS._parsePath(path);
 			path=parsed.path;
 			self.ns=parsed.ns||self.ns;
 			if (parsed.resource)
@@ -179,7 +184,6 @@ module.exports=class GITROWS{
 		obj=Object.values(obj);
 		Object.keys(filter).forEach((key) => {
 			if (key.indexOf('$')==0) return;
-			console.log('key',key);
 			let value=filter[key];
 			if (value.indexOf(':')>-1){
 				value=value.split(':');
@@ -236,76 +240,51 @@ module.exports=class GITROWS{
 		}
 		return url;
 	}
-	static buildStaticUrl(path,ns,type){
-		if (typeof path===undefined||path.indexOf('/')==-1)
-			return false;
-			let parts=path.split('/').filter(x=>x);
-			let url='',server='';
-			let extension='.'+(type||GITROWS.getExtension(path));
-			if (path.indexOf(extension)>-1) extension='';
-			switch (ns) {
-				case 'gitlab':
-				  server=this.server||'gitlab.com';
-					url='https://'+server+'/'+parts.shift()+'/'+parts.shift()+'/-/raw/master/'+parts.join('/')+extension;
-					break;
-				default:
-				  server=this.server||'raw.githubusercontent.com';
-					url='https://'+server+'/'+parts.shift()+'/'+parts.shift()+'/master/'+parts.join('/')+extension;
-			}
-			return url;
-	}
-	static getExtension(path,fallback='json'){
-		if (path.split('/').pop().indexOf('.')==-1) return fallback;
-		return path.split('.').pop().toLowerCase();
-	}
-	static _getNamespace(path){
-		let scope='github',server;
-		path=path.split('/').filter(e=>e);
-		if (path[0].indexOf('@')>-1){
-			let ns=path.shift();
-			switch (ns.toLowerCase()) {
-				case '@gitlab':
-				case '@gitlab.com':
-					scope='gitlab';
-					break;
-				case '@github':
-				case '@github.com':
-					scope='github';
-					break;
-				default:
-					scope='gitlab';
-					server=ns.substr(1);
-			}
-		}
-		path='/'+path.join('/');
-		return {scope:scope,path:path,server:server}
-	}
-	static _getResource(path){
-		let regex=/\.(json|csv)$/gi,el=path.split('/').filter(e=>e);
-		let pos=el.findIndex(e=>e.match(regex));
-		let res=~pos?el.splice(pos+1).filter(e=>e).join('/'):undefined;
-		res=res&&res.length?res:undefined;
-		let repo=el.shift();
-		let tree=el.join('/');
-		return {resource:res,path:repo+'/'+tree,repo:repo,tree:tree}
-	}
-	static parsePath(path){
+	static _parsePath(path){
 		if (GITROWS._isUrl(path)){
 			return GITROWS._parseUrl(path);
 		}
-		let ns=GITROWS._getNamespace(path);
-		let res=GITROWS._getResource(ns.path);
-		return {ns:ns.scope,resource:res.resource,path:res.path,repo:res.repo,tree:res.tree,server:ns.server}
+		//@see: https://regex101.com/r/DwLNHW/4
+		const regex = /(((?:(?<=@)(?<ns>[\w\.]+)\/)?(?:(?<owner>[\w-]+)?\/)(?<repo>[\w-]+)((?:#)(?<branch>[\w-]+))?)|(?:\.))\/(?:(?<=\/)(?<path>[\w-\.\/]+\.(?:json|csv)))(?:\/(?<=\/)(?<resource>[\w]+))?/mg;
+		let result=regex.exec(path)||{};
+		return result.groups;
 	}
 	static _parseUrl(url){
-		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>[\w-]+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?(?:blob\/)(?<branch>(?<=blob\/)[\w]+)\/)?(?<path>[\w\/\-\.]+.(?:json|csv))/gm;
-		let result=regex.exec(url);
+		//@see https://regex101.com/r/S9zzb9/1
+		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>[\w-]+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?(?:blob\/)(?<branch>(?<=blob\/)[\w]+)\/)?(?<path>[\w\/\-\.]+\.(?:json|csv))/gm;
+		let result=regex.exec(url)||{};
 		return result.groups;
 	}
 	static _pathFromUrl(url){
 		let data=GITROWS._parseUrl(url);
 		if (!GITROWS._isValidPath(data)) return null;
-		return `@${data.ns}/${data.owner}/${data.repo}/${data.path}`;
+		data.branch=data.branch?'/#'+data.branch:'';
+		return `@${data.ns}/${data.owner}/${data.repo}${data.branch}/${data.path}`;
+	}
+	static _urlFromPath(path,raw=false){
+		let data=typeof path=='object'?path:GITROWS._parsePath(path);
+		if (!GITROWS._isValidPath(data)) return null;
+		data.branch=data.branch||'master';
+		if (!data.ns||data.ns=='github'){
+			data.server=raw?'raw.githubusercontent.com':'github.com';
+			data.format=raw?'':'blob/';
+			return `https://${data.server}/${data.owner}/${data.repo}/${data.format+data.branch}/${data.path}`;
+		}
+		data.server=data.server||'gitlab.com';
+		data.format=raw?'raw':'blob';
+		return `https://${data.server}/${data.owner}/${data.repo}/-/${data.format}/${data.branch}/${data.path}`;
+	}
+	static _apiFromPath(path){
+		let data=typeof path=='object'?path:GITROWS._parsePath(path);
+		if (!GITROWS._isValidPath(data)) return null;
+		if (!data.ns||data.ns=='github'){
+			data.server='api.github.com';
+			return `https://${data.server}/repos/${data.owner}/${data.repo}/contents/${data.path}`;
+		}
+		data.server=data.server||'gitlab.com';
+		data.project=encodeURIComponent(data.owner+'/'+data.repo);
+		data.path=encodeURIComponent(data.path);
+		return `https://${data.server}/api/v4/projects/${data.project}/repository/files/${data.path}`;
 	}
 	static _isValidPath(obj){
 		let mandatory=['ns','owner','repo','path'];
@@ -392,19 +371,11 @@ module.exports=class GITROWS{
 	}
 	static _isUrl(url){
 		/*
-		*	Taken from https://github.com/kevva/url-regex
-		*	MIT © Kevin Mårtensson and Diego Perini
+		*	@see https://gist.github.com/dperini/729294
+		*	MIT © Diego Perini
 		*/
-		const protocol = `(?:(?:[a-z]+:)?//)${options.strict ? '' : '?'}`;
-		const auth = '(?:\\S+(?::\\S*)?@)?';
-		const ip = ipRegex.v4().source;
-		const host = '(?:(?:[a-z\\u00a1-\\uffff0-9][-_]*)*[a-z\\u00a1-\\uffff0-9]+)';
-		const domain = '(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*';
-		const tld = `(?:\\.${options.strict ? '(?:[a-z\\u00a1-\\uffff]{2,})' : `(?:${tlds.sort((a, b) => b.length - a.length).join('|')})`})\\.?`;
-		const port = '(?::\\d{2,5})?';
-		const path = '(?:[/?#][^\\s"]*)?';
-		const regex = `(?:${protocol}|www\\.)${auth}(?:localhost|${ip}|${host}${domain}${tld})${port}${path}`;
-		return RegExp(`(?:^${regex}$)`, 'i').test(url);
+		const regex = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
+		return regex.test(url);
 	}
 	parseContent(content){
 		let self=this;
@@ -423,5 +394,20 @@ module.exports=class GITROWS{
 		} finally {
 			return data;
 		}
+	}
+	options(obj){
+		let self=this;
+		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv'];
+		if (typeof obj=='undefined'){
+			let data={};
+			allowed.forEach((item, i) => {
+				data[item]=this[item];
+			});
+			return data;
+		}
+		for (let key in obj) {
+			if (allowed.includes(key)&&typeof obj[key]!=='undefined') this[key]=obj[key];
+		}
+		return self;
 	}
 }
