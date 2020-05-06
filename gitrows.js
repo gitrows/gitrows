@@ -22,10 +22,14 @@ module.exports=class GITROWS{
 			message:'GitRows API Post (https://gitrows.com)',
 			author:{name:"GitRows",email:"api@gitrows.com"},
 			csv:{delimiter:","},
+			strict:false
 		};
 		Object.keys(this).forEach(key=>delete this[key]);
 		this.options(defaults);
 		return this;
+	}
+	reset(){
+		return this._defaults();
 	}
 	pull(path){
 		let self=this;
@@ -148,6 +152,10 @@ module.exports=class GITROWS{
 			.then(
 				d=>{
 					base=self.parseContent(atob(d.content));
+					if (self.strict){
+						self.columns=self.columns||[...GITROWS._columns(base)]
+						data=GITROWS._columnsApply(data,columns);
+					}
 					if (!Array.isArray(base))
 						base=[base];
 					if (Array.isArray(data))
@@ -372,6 +380,26 @@ module.exports=class GITROWS{
 		const regex = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
 		return regex.test(url);
 	}
+	static _columns(obj){
+		let columns=new Set();
+		if (!Array.isArray(obj))
+			Object.keys(obj).forEach(item =>columns.add(item));
+		else
+			obj.forEach(row => Object.keys(row).forEach(item =>columns.add(item)));
+		return Array.from(columns);
+	}
+	static _columnsApply(obj,columns){
+		if (!Array.isArray(obj)){
+			columns.forEach(item => obj[item]=obj[item]||null);
+			Object.keys(obj).forEach((key) => {if(!~columns.indexOf(key)) delete obj[key];});
+		}
+		else
+			obj.forEach((row,index) => obj[index]=GITROWS._columnsApply(row,columns));
+		return obj;
+	}
+ 	columns(path){
+		return this.get(path).then(data=>GITROWS._columns(data));
+	}
 	parseContent(content){
 		let self=this;
 		let data=null;
@@ -392,7 +420,7 @@ module.exports=class GITROWS{
 	}
 	options(obj){
 		let self=this;
-		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv','type'];
+		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv','type','columns','strict'];
 		if (typeof obj=='undefined'){
 			let data={};
 			allowed.forEach((item, i) => {
