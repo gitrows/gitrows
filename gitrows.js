@@ -146,15 +146,15 @@ module.exports=class GITROWS{
 		});
 	}
 	add(path,data){
-		let self=this,base=[];
+		let self=this,base=[],columns;
 		return new Promise(function(resolve, reject) {
 			self.pull(path)
 			.then(
 				d=>{
 					base=self.parseContent(atob(d.content));
 					if (self.strict){
-						self.columns=self.columns||[...GITROWS._columns(base)]
-						data=GITROWS._columnsApply(data,columns);
+						self.columns=self.columns||GITROWS._columns(base);
+						data=GITROWS._columnsApply(data,self.columns);
 					}
 					if (!Array.isArray(base))
 						base=[base];
@@ -397,7 +397,7 @@ module.exports=class GITROWS{
 			obj.forEach((row,index) => obj[index]=GITROWS._columnsApply(row,columns));
 		return obj;
 	}
- 	columns(path){
+ 	getColumns(path){
 		return this.get(path).then(data=>GITROWS._columns(data));
 	}
 	parseContent(content){
