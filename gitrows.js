@@ -8,26 +8,33 @@ const CSV = {
 	stringify: require('csv-stringify/lib/sync')
 };
 
+const response=require('./lib/response.js');
+
 module.exports=class GITROWS{
 	constructor(options){
-		this.ns='github';
-		this.branch='master'
-		this.message='GitRows API Post (https://gitrows.com)';
-		this.author={name:"GitRows",email:"api@gitrows.com"};
-		this.csv={delimiter:","};
-		if (typeof options!='undefined'){
-			for (let key in options){
-				this[key]=options[key];
-			}
-		}
+		this._defaults();
+		this.options(options);
+	}
+	_defaults(){
+		const defaults={
+			ns:'github',
+			branch:'master',
+			message:'GitRows API Post (https://gitrows.com)',
+			author:{name:"GitRows",email:"api@gitrows.com"},
+			csv:{delimiter:","},
+		};
+		Object.keys(this).forEach(key=>delete this[key]);
+		this.options(defaults);
+		return this;
 	}
 	pull(path){
 		let self=this;
 		return new Promise(function(resolve, reject) {
 			let headers={};
-			const pathData=GITROWS._parsePath(path);
+			const pathData=GITROWS._parsePath(path)||{};
+			if (!pathData.path) reject(response(400));
 			self.options(pathData);
-			if(!GITROWS._isValidPath(self.options())) reject("400 Can't call api with options: "+JSON.stringify(self.options()));
+			if(!GITROWS._isValidPath(self.options())) reject(response(400));
 			if (self.user!==undefined&&self.token!==undefined&&self.ns=='github')
 				headers["Authorization"]="Basic "+btoa(self.user+":"+self.token);
 			let url=GITROWS._apiFromPath(self.options());
@@ -36,7 +43,7 @@ module.exports=class GITROWS{
 				headers: headers,
 			})
 			.then(r=>{
-				if (!r.ok) reject(r);
+				if (!r.ok) reject(response(r.status));
 				resolve(r.json())}
 			)
 			.catch((e) => console.error('Error:', e));
@@ -45,15 +52,16 @@ module.exports=class GITROWS{
 	push(path,obj,sha,method='PUT'){
 			let self=this;
 			return new Promise(function(resolve, reject) {
-				if (!self.token) reject("403 You must provide an API token to commit")
-				const pathData=GITROWS._parsePath(path);
+				if (!self.token) reject(response(401));
+				const pathData=GITROWS._parsePath(path)||{};
+				if (!pathData.path) reject(response(400));
 				self.options(pathData);
-				if(!GITROWS._isValidPath(self.options())) reject("400 Can't commit data with options: "+JSON.stringify(self.options()));
+				if(!GITROWS._isValidPath(self.options())) reject(response(400));
 				let data={
 					"branch":self.branch
 				};
 				if (typeof obj!='undefined'&&obj)
-					data.content=btoa(~self.path.indexOf('.csv')?CSV.stringify(obj,{header:true}):JSON.stringify(obj));
+					data.content=btoa(self.type.toLowerCase()=='csv'?CSV.stringify(obj,{header:true}):JSON.stringify(obj));
 				if (typeof sha!='undefined')
 					data.sha=sha;
 				let headers={
@@ -79,9 +87,10 @@ module.exports=class GITROWS{
 					body:JSON.stringify(data),
 				})
 				.then(r=>{
-					if (!r.ok) reject(r);
-					resolve(method!=='DELETE'?r.json():r.text())}
-				)
+					if (!r.ok) reject(response(r.status));
+					resolve(response(r.status));
+				})
+					//resolve(method!=='DELETE'?r.json():response(r.status));
 				.catch((e) => console.error('Error:', e));
 			});
 	}
@@ -98,18 +107,19 @@ module.exports=class GITROWS{
 	get(path,query){
 		let self=this;
 		return new Promise(function(resolve, reject) {
-		  const pathData=GITROWS._parsePath(path);
+			const pathData=GITROWS._parsePath(path)||{};
+			if (!pathData.path) reject(response(400));
 			self.options(pathData);
+			if(!GITROWS._isValidPath(self.options())) reject(response(400));
 			if (pathData.resource){
 				query=query||{};
 				query.id=pathData.resource;
 			}
-			if(!GITROWS._isValidPath(self.options())) reject("400 Can't get data with options: "+JSON.stringify(self.options()));
 			const url=GITROWS._urlFromPath(self.options(),true);
-			fetch(url)
+			return fetch(url)
 			.then(
 				r=>{
-					if (!r.ok) reject(r);
+					if (!r.ok) reject(response(r.status));
 					return r.text();
 				}
 			)
@@ -128,7 +138,7 @@ module.exports=class GITROWS{
 				}
 				resolve(data);
 			})
-			.catch(f=>reject(f));
+			.catch(f=>console.log(f));
 		});
 	}
 	add(path,data){
@@ -151,7 +161,7 @@ module.exports=class GITROWS{
 				base=data;
 				self.push(path,base).then(r=>resolve(r)).catch(e=>reject(e));
 			})
-			.finally(resolve(base));
+			.finally(resolve(response(200)));
 		});
 	}
 	delete(path,id){
@@ -230,13 +240,13 @@ module.exports=class GITROWS{
 			return GITROWS._parseUrl(path);
 		}
 		//@see: https://regex101.com/r/DwLNHW/4
-		const regex = /(((?:(?<=@)(?<ns>[\w\.]+)\/)?(?:(?<owner>[\w-]+)?\/)(?<repo>[\w-]+)((?:#)(?<branch>[\w-]+))?)|(?:\.))\/(?:(?<=\/)(?<path>[\w-\.\/]+\.(?:json|csv)))(?:\/(?<=\/)(?<resource>[\w]+))?/mg;
+		const regex = /(((?:(?<=@)(?<ns>[\w\.]+)\/)?(?:(?<owner>[\w-]+)?\/)(?<repo>[\w-]+)((?:#)(?<branch>[\w-]+))?)|(?:\.))\/(?:(?<=\/)(?<path>[\w-\.\/]+\.(?<type>json|csv)))(?:\/(?<=\/)(?<resource>[\w]+))?/mg;
 		let result=regex.exec(path)||{};
 		return result.groups;
 	}
 	static _parseUrl(url){
 		//@see https://regex101.com/r/S9zzb9/1
-		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>[\w-]+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?(?:blob\/)(?<branch>(?<=blob\/)[\w]+)\/)?(?<path>[\w\/\-\.]+\.(?:json|csv))/gm;
+		const regex = /http(?:s?):\/\/(?<ns>github|gitlab).com\/(?<owner>[\w-]+)\/(?<repo>[\w-\.]+)\/(?:(?:-\/)?(?:blob\/)(?<branch>(?<=blob\/)[\w]+)\/)?(?<path>[\w\/\-\.]+\.(?<type>json|csv))/gm;
 		let result=regex.exec(url)||{};
 		return result.groups;
 	}
