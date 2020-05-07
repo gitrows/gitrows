@@ -22,7 +22,8 @@ module.exports=class GITROWS{
 			message:'GitRows API Post (https://gitrows.com)',
 			author:{name:"GitRows",email:"api@gitrows.com"},
 			csv:{delimiter:","},
-			strict:false
+			strict:false,
+			default:null
 		};
 		Object.keys(this).forEach(key=>delete this[key]);
 		this.options(defaults);
@@ -154,7 +155,7 @@ module.exports=class GITROWS{
 					base=self.parseContent(atob(d.content));
 					if (self.strict){
 						self.columns=self.columns||GITROWS._columns(base);
-						data=GITROWS._columnsApply(data,self.columns);
+						data=GITROWS._columnsApply(data,self.columns,self.default);
 					}
 					if (!Array.isArray(base))
 						base=[base];
@@ -388,9 +389,9 @@ module.exports=class GITROWS{
 			obj.forEach(row => Object.keys(row).forEach(item =>columns.add(item)));
 		return Array.from(columns);
 	}
-	static _columnsApply(obj,columns){
+	static _columnsApply(obj,columns,default=null){
 		if (!Array.isArray(obj)){
-			columns.forEach(item => obj[item]=obj[item]||null);
+			columns.forEach(item => obj[item]=obj[item]||default);
 			Object.keys(obj).forEach((key) => {if(!~columns.indexOf(key)) delete obj[key];});
 		}
 		else
@@ -420,7 +421,7 @@ module.exports=class GITROWS{
 	}
 	options(obj){
 		let self=this;
-		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv','type','columns','strict'];
+		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv','type','columns','strict','default'];
 		if (typeof obj=='undefined'){
 			let data={};
 			allowed.forEach((item, i) => {

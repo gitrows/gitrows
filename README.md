@@ -80,8 +80,7 @@ https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv)
 
 Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json
 
-
-### get(path [,filter])
+### get(path[, filter])
 The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
 
 ```js
@@ -101,8 +100,41 @@ For simple matching if a value is present (e.g. an id) supply the field key and 
 * `^:`		starts with
 * `$:`		ends with
 
-<--For a full list of supported operators checkout the [documentation](https://gitrows/docs/get#filters)-->
+For the GitRows API you append the filters as query parameters: https://api.gitrows.com/nicolaszimmer/test-data/test.json?title=foo
 
+### add(path, data)
+For adding data (and deleting or creating new datafiles) you must set your username and an OAuth (personal access) token. You can generate a new one in your [GitHub Developer Settings](https://github.com/settings/tokens):
+
+```js
+let options={
+	username:"yourUsername",
+	token:"yourSecretToken"
+};
+
+const data=[
+ {
+ 	id:"0003",
+ 	title:"A New Title",
+ 	content:"Some new content"
+ },
+ {
+	 id:"0004",
+	 title:"Another New Title"
+ }
+];
+
+gitrows.options(options);
+
+gitrows.add(path,data)
+ .then((response)=>{
+  //handle response, which has the format (Object){code:200,description='OK'}
+ })
+ .catch((error)=>{
+  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
+ });
+```
+
+To if you want to ensure consistent data structures set `options({strict:true})`. GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`.
 
 ## Contributing to GitRows
 To contribute, follow these steps:
