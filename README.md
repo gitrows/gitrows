@@ -41,6 +41,7 @@ let path = '@github/nicolaszimmer/test-data/test.json';
 gitrows.get(path)
  .then( (data) => {
   //handle (Array/Object)data
+  console.log(data);
  })
  .catch( (error) => {
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
