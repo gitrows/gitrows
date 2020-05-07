@@ -121,8 +121,8 @@ For adding data (and deleting or creating new data files) you must set your user
 
 ```js
 let options = {
-	username:"yourUsername",
-	token:"yourSecretToken"
+ username:"yourUsername",
+ token:"yourSecretToken"
 };
 
 let data = [
@@ -238,7 +238,7 @@ The following options are data file repository related and may be overwritten by
 * `ns`	either `github` or `gitlab`
 * `owner`	repository owner
 * `repo`	repository name
-* `branch` select another branch than `master`
+* `branch` select another than `master`
 * `path`	directory and/or file name with extension
 
 If you want to alter the contents of the data files you need to provide a username and access token for the selected namespace:
@@ -246,7 +246,7 @@ If you want to alter the contents of the data files you need to provide a userna
 * `user`	a GitHub or GitLab username (may be omitted for GitLab)
 * `token`	a GitHub or GitLab token
 
-The commits are done with a standard message and authored by GitRows. Change if needed. This is useful for different GitRows instances committing to the same repo:
+The commits are done with a standard message and authored by GitRows by default. Change if needed. This is useful for different GitRows instances committing to the same repo:
 
 * `message`	commit message
 * `author`	an object with the properties `name` and `email` to identify the committer
