@@ -14,9 +14,9 @@ As a package for `node` use npm:
 npm i gitrows
 ```
 
-You can include GitRows in the `browser` by including `gitrows.js` or `gitrows.min.js` from the `./dist` folder or using unpkg:
+You can use GitRows in the `browser` by including `gitrows.js` or `gitrows.min.js` from the `./dist` folder or using unpkg:
 ```js
-<script src="https://unpkg.com/gitrows@latest/dist/gitrows.min.js">
+<script src="https://unpkg.com/gitrows@latest/dist/gitrows.min.js"></script>
 ```
 
 ## Usage
@@ -25,10 +25,10 @@ You can include GitRows in the `browser` by including `gitrows.js` or `gitrows.m
 
 ```js
 // If you use GitRows as a module:
-const Gitrows=require('gitrows');
+const Gitrows = require('gitrows');
 
 // Init the GitRows client, you can provide options at this point, later or just run on the defaults
-const gitrows=new Gitrows();
+const gitrows = new Gitrows();
 
 /*
 * You can either paste the GitHub/GitLab file url from the browser, e.g.
@@ -36,13 +36,13 @@ const gitrows=new Gitrows();
 * or use the GitRows API style @ns/repo/path/to/file
 */
 
-let path='@github/nicolaszimmer/test-data/test.json';
+let path = '@github/nicolaszimmer/test-data/test.json';
 
 gitrows.get(path)
- .then((data)=>{
+ .then( (data) => {
   //handle (Array/Object)data
  })
- .catch((error)=>{
+ .catch( (error) => {
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
  });
 ```
@@ -61,7 +61,7 @@ or use the GitRows API style:
 @namespace/owner/repository#branch/directory/file(.json|.csv)
 ```
 
-`@namespace` and `#branch` are optional and default to `github` and `master`, if you want to access a GitLab repository use the `gitlab` namespace.
+`@namespace` and `#branch` are optional and default to `github` and `master`, if you want to access a GitLab repository, use the `gitlab` namespace.
 
 
 *Which notation to use?*
@@ -78,7 +78,7 @@ The API style got it's name from its use with the GitRows API tool which allows 
 https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv)
 ```
 
-Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json
+Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json If you are unsure about how a file url is translated into API style, you can use the static `GITROWS._pathFromUrl(url)` helper function or `GITROWS._ulrFromPath(url)` vice versa.
 
 ### get(path[, filter])
 The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
@@ -103,7 +103,9 @@ For simple matching if a value is present (e.g. an id) supply the field key and 
 For the GitRows API you append the filters as query parameters: https://api.gitrows.com/nicolaszimmer/test-data/test.json?title=foo
 
 ### add(path, data)
-For adding data (and deleting or creating new datafiles) you must set your username and an OAuth (personal access) token. Unless you feel particularly adventurous you should **never** do this in a public environment like a website. You can generate a new one in your [GitHub Developer Settings](https://github.com/settings/tokens):
+> requires `token`
+
+For adding data (and deleting or creating new data files) you must set your username and an OAuth (personal access) token. Unless you feel particularly adventurous you should **never** do this in a production environment like a website. You can generate a new one in your [GitHub Developer Settings](https://github.com/settings/tokens):
 
 ```js
 let options={
@@ -134,7 +136,37 @@ gitrows.add(path,data)
  });
 ```
 
-To if you want to ensure consistent data structures set `options({strict:true})`. GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`.
+To if you want to enforce consistent data structures set `options({strict:true})`. GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`. You can also set the columns as an option with `options({columns:[]})`.
+
+### delete(path,{id:''})
+> requires `token`
+
+To delete an entry from data you must provide it's `id`, which may either be
+
+* the `id property`, if the data consists of an `Array` of `Objects`
+* the `property name`, if the data consists of a single `Object`
+
+```js
+const remove='0001';
+
+gitrows.delete(path,remove)
+ .then((response)=>{
+  //handle response, which has the format (Object){code:200,description='OK'}
+ })
+ .catch((error)=>{
+  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
+ });
+```
+
+If you use the API style you may also append the id to the path:
+
+```
+@namespace/owner/repository#branch/directory/file(.json|.csv)/id
+```
+
+### create(path[ ,data])
+> requires `token`
+
 
 ## Contributing to GitRows
 To contribute, follow these steps:
