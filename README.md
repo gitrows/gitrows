@@ -61,7 +61,7 @@ or use the GitRows API style:
 @namespace/owner/repository#branch/directory/file(.json|.csv)
 ```
 
-`@namespace` and `#branch` are optional and default to `github` and `master`
+`@namespace` and `#branch` are optional and default to `github` and `master`, if you want to access a GitLab repository use the `gitlab` namespace.
 
 
 *Which notation to use?*
@@ -103,7 +103,7 @@ For simple matching if a value is present (e.g. an id) supply the field key and 
 For the GitRows API you append the filters as query parameters: https://api.gitrows.com/nicolaszimmer/test-data/test.json?title=foo
 
 ### add(path, data)
-For adding data (and deleting or creating new datafiles) you must set your username and an OAuth (personal access) token. You can generate a new one in your [GitHub Developer Settings](https://github.com/settings/tokens):
+For adding data (and deleting or creating new datafiles) you must set your username and an OAuth (personal access) token. Unless you feel particularly adventurous you should **never** do this in a public environment like a website. You can generate a new one in your [GitHub Developer Settings](https://github.com/settings/tokens):
 
 ```js
 let options={
@@ -118,8 +118,8 @@ const data=[
  	content:"Some new content"
  },
  {
-	 id:"0004",
-	 title:"Another New Title"
+	id:"0004",
+	title:"Another New Title"
  }
 ];
 
