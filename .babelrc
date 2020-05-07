@@ -1,7 +1,9 @@
 {
   "env": {
     "esm": {
-      "presets": ["github"]
+      "presets": [
+				"github"
+			]
     },
     "umd": {
       "plugins": [
@@ -9,7 +11,9 @@
           "globals": {
             "selector-set": "SelectorSet"
           }
-        }]
+        }],
+				["@babel/plugin-transform-named-capturing-groups-regex"],
+    		["@babel/plugin-transform-unicode-regex"]
       ],
       "moduleId": "gitrows",
       "presets": ["github"]
