@@ -389,9 +389,9 @@ module.exports=class GITROWS{
 			obj.forEach(row => Object.keys(row).forEach(item =>columns.add(item)));
 		return Array.from(columns);
 	}
-	static _columnsApply(obj,columns,default=null){
+	static _columnsApply(obj,columns,defaultValue=null){
 		if (!Array.isArray(obj)){
-			columns.forEach(item => obj[item]=obj[item]||default);
+			columns.forEach(item => obj[item]=obj[item]||defaultValue);
 			Object.keys(obj).forEach((key) => {if(!~columns.indexOf(key)) delete obj[key];});
 		}
 		else
