@@ -127,13 +127,13 @@ let options = {
 
 let data = [
  {
- 	id:"0003",
- 	title:"A New Title",
- 	content:"Some new content"
+  id:"0003",
+  title:"A New Title",
+  content:"Some new content"
  },
  {
-	id:"0004",
-	title:"Another New Title"
+  id:"0004",
+  title:"Another New Title"
  }
 ];
 
