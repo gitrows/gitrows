@@ -46,6 +46,7 @@ gitrows.get(path)
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
  });
 ```
+
 ### The Path
 
 To select the data file you can either paste the GitHub/GitLab file url from the browser, e.g.
@@ -57,10 +58,11 @@ https://github.com/nicolaszimmer/test-data/blob/master/test.json
 or use the GitRows API style:
 
 ```
-[@namespace/]owner/repository[#branch]/directory/file(.json|.csv)
+@namespace/owner/repository#branch/directory/file(.json|.csv)
 ```
 
-`[@namespace]` and `[#branch]` are optional and default to `github` and `master`
+`@namespace` and `#branch` are optional and default to `github` and `master`
+
 
 *Which notation to use?*
 
@@ -70,7 +72,16 @@ Although it's easier for a simple query to just paste the url I strongly encoura
 ./directory/file(.json|.csv)
 ```
 
-### get()
+The API style got it's name from its use with the GitRows API tool which allows you to query all public repos with a consistent and free api call:
+
+```
+https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv)
+```
+
+Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json
+
+
+### get(path [,filter])
 The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
 
 ```js
@@ -90,7 +101,7 @@ For simple matching if a value is present (e.g. an id) supply the field key and 
 * `^:`		starts with
 * `$:`		ends with
 
-For a full list of supported operators checkout the [documentation](https://gitrows/docs/get#filters)
+<--For a full list of supported operators checkout the [documentation](https://gitrows/docs/get#filters)-->
 
 
 ## Contributing to GitRows
