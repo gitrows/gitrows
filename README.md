@@ -36,7 +36,9 @@ const gitrows=new Gitrows();
 * or use the GitRows API style @ns/repo/path/to/file
 */
 
-gitrows.get('@github/nicolaszimmer/test-data/test.json')
+let path='@github/nicolaszimmer/test-data/test.json';
+
+gitrows.get(path)
  .then((data)=>{
   //handle (Array/Object)data
  })
@@ -44,7 +46,31 @@ gitrows.get('@github/nicolaszimmer/test-data/test.json')
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
  });
 ```
+### The Path
 
+To select the data file you can either paste the GitHub/GitLab file url from the browser, e.g.
+
+```url
+https://github.com/nicolaszimmer/test-data/blob/master/test.json
+```
+
+or use the GitRows API style:
+
+```
+[@namespace/]owner/repository[#branch]/directory/file(.json|.csv)
+```
+
+`[@namespace]` and `[#branch]` are optional and default to `github` and `master`
+
+*Which notation to use?*
+
+Although it's easier for a simple query to just paste the url I strongly encourage the use of the API style. After you have initially the namespace, owner, repository and/or branch either by calling a method with a path or by setting them with the `options()` method you can make subsequent calls by just providing `directory/file`:
+
+```
+./directory/file(.json|.csv)
+```
+
+### get()
 The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
 
 ```js
@@ -84,4 +110,5 @@ You can reach me at <nicolas@gitrows.com>
 
 ## License
 
+Copyright © 2020, [Nicolas Zimmer](https://github.com/nicolaszimmer).
 [MIT](LICENSE)
