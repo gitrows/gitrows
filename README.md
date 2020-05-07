@@ -4,17 +4,17 @@
 
 GitRows makes it easy to use and store data in GitHub and GitLab repos. You can read data stored in `.csv` and `.json` files from **all public repos** and read, create, update and delete data in **public or private repos** that you have access to.
 
-GitRows works with `node` and in all modern `browsers`. Alternatively learn more on [gitrows.com](https://gitrows.com) how to use GitRows' free API to integrate data into your websites/apps.
+GitRows works with `node` and in any modern `browser`. Alternatively learn more on [gitrows.com](https://gitrows.com) how to use GitRows' free API to integrate data into your websites/apps.
 
 
 ## Installation
 
-As a package for node use npm:
+As a package for `node` use npm:
 ```shell
 npm i gitrows
 ```
 
-You can include GitRows in your website by including `gitrows.js` or `gitrows.min.js` from the `./dist` folder or using unpkg:
+You can include GitRows in the `browser` by including `gitrows.js` or `gitrows.min.js` from the `./dist` folder or using unpkg:
 ```js
 <script src="https://unpkg.com/gitrows@latest/dist/gitrows.min.js">
 ```
@@ -38,14 +38,34 @@ const gitrows=new Gitrows();
 
 gitrows.get('@github/nicolaszimmer/test-data/test.json')
  .then((data)=>{
-  //handle data
+  //handle (Array/Object)data
  })
  .catch((error)=>{
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
  });
 ```
 
-Add run commands and examples you think users will find useful. Provide an options reference for bonus points!
+The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
+
+```js
+let filter={
+ foo:'bar',
+ number:'lt:99'
+}
+```
+
+For simple matching if a value is present (e.g. an id) supply the field key and required value. You can also use a number of operators in the value field for comparison:
+
+* `not:`	equals not
+* `lt:`		less than
+* `lte:`	less than
+* `gt:`		greater than
+* `gte:`	greater than or equal
+* `^:`		starts with
+* `$:`		ends with
+
+For a full list of supported operators checkout the [documentation](https://gitrows/docs/get#filters)
+
 
 ## Contributing to GitRows
 To contribute, follow these steps:
