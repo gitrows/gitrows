@@ -153,9 +153,9 @@ gitrows.add(path,data)
  });
 ```
 
-GitRows accepts the data as an `Array` of `Object`s if you want to add one ore more entries (rows) or a single `Object` for appending one entry (row).
+GitRows accepts the data as an `Array` of `Objects` if you want to add one ore more entries (rows) or a single `Object` for appending one entry (row).
 
-To if you want to enforce consistent data structures set `options({strict:true})`. GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`. You can also set the columns as an option with `options({columns:[]})`.
+To if you want to enforce consistent data structures set `options({strict:true})`. If true, GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`. You can also set the columns as an option with `options({columns:[]})`.
 
 ### delete(path, id:'')
 > requires `token`
