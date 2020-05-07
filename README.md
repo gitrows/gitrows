@@ -27,7 +27,7 @@ You can include GitRows in your website by including `gitrows.js` or `gitrows.mi
 // If you use GitRows as a module:
 const Gitrows=require('gitrows');
 
-// Init the GitRows client, you can provide options at this point or later
+// Init the GitRows client, you can provide options at this point, later or just run on the defaults
 const gitrows=new Gitrows();
 
 /*
@@ -35,13 +35,14 @@ const gitrows=new Gitrows();
 * https://github.com/nicolaszimmer/test-data/blob/master/test.json
 * or use the GitRows API style @ns/repo/path/to/file
 */
+
 gitrows.get('@github/nicolaszimmer/test-data/test.json')
-.then((data)=>{
-//handle data
-})
-.catch((error)=>{
-//handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
-});
+ .then((data)=>{
+  //handle data
+ })
+ .catch((error)=>{
+  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
+ });
 ```
 
 Add run commands and examples you think users will find useful. Provide an options reference for bonus points!
