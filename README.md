@@ -73,7 +73,7 @@ The API style got it's name from its use with the free GitRows API tool which al
 https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv)
 ```
 
-Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json If you are unsure about how a file url is translated into API style, you can use the static `GITROWS._pathFromUrl(url)` helper function or `GITROWS._urlFromPath(url)` to check the corresponding repository url for a path.
+Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json If you are unsure about how a file url is translated into API style, you can use from `.lib/path.js` the `Path.fromUrl(url)` helper function or `Path.toUrl(path)` to check the corresponding repository url for a path.
 
 ### get(path[, filter])
 The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
@@ -110,9 +110,16 @@ All filters are applied before the aggregation, so for example to get the averag
 To limit the returned columns you can use `$select` with a comma delimited list of the column names you want to retrieve:
 
 ```js
-gitrows.get(path,{'$select',['col1','col3','col5']});
+gitrows.get(path,{'$select':['col1','col3','col5']});
 ```
 
+You can order the result with `$order:'columnName:asc` or `$order:'columnName:desc` respectively and `$limit` the entries returned:
+
+```js
+gitrows.get(path,{'$order':'col1:asc','$limit':'0,5'});
+```
+
+GitRows' $limit behaves like MySQL's equivalent: If you supply one number, this will be maximum number of rows returned starting from the entry at index 0, if you give two comma delimited numbers, the first will be the offset and the second the number of rows.
 
 ### add(path, data)
 > requires `token`
