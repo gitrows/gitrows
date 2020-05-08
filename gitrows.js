@@ -9,6 +9,7 @@ const CSV = {
 };
 
 const response=require('./lib/response.js');
+const util=require('./lib/util.js');
 
 module.exports=class GITROWS{
 	constructor(options){
@@ -192,7 +193,7 @@ module.exports=class GITROWS{
 			.finally(resolve(base));
 		});
 	}
-	static where(obj,filter){
+	/*static where(obj,filter){
 		if (typeof filter=='undefined'||Object.keys(filter).length==0) return obj;
 		if(obj.constructor !== Array && typeof filter.id!='undefined'){
 			if (!~filter.id.indexOf('not:'))
@@ -242,7 +243,7 @@ module.exports=class GITROWS{
 			obj = obj.filter(item=>item[key]!==undefined&&item[key]==value);
 		});
 		return obj;
-	}
+	}*/
 	static _parsePath(path){
 		if (typeof path=='object') return path;
 		if (GITROWS._isUrl(path)){
