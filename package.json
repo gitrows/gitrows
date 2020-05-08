@@ -8,8 +8,8 @@
     "prebuild": "npm run clean && mkdir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-umd": "BABEL_ENV=umd babel gitrows.js -o dist/gitrows.umd.js",
-    "build-esm": "BABEL_ENV=esm babel gitrows.js -o dist/gitrows.esm.js",
-    "build": "npm run build-umd && npm run build-esm"
+		"build-umd-path": "BABEL_ENV=umd babel lib/path.js -o dist/utils/path.umd.js",
+    "build": "npm run build-umd && npm run build-umd-path"
   },
   "repository": {
     "type": "git",
