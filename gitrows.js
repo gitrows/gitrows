@@ -1,7 +1,4 @@
 const fetch=require('node-fetch');
-const base64=require('base-64');
-const atob=base64.decode;
-const btoa=base64.encode;
 
 const CSV = {
 	parse:require('csv-parse/lib/sync'),
@@ -12,7 +9,7 @@ const Response=require('./lib/response.js');
 const Util=require('./lib/util.js');
 const Path=require('./lib/path.js');
 
-module.exports=class GITROWS{
+module.exports=class Gitrows{
 	constructor(options){
 		this._defaults();
 		this.options(options);
@@ -43,7 +40,7 @@ module.exports=class GITROWS{
 			self.options(pathData);
 			if(!Path.isValid(self.options())) reject(Response(400));
 			if (self.user!==undefined&&self.token!==undefined&&self.ns=='github')
-				headers["Authorization"]="Basic "+btoa(self.user+":"+self.token);
+				headers["Authorization"]="Basic "+Util.btoa(self.user+":"+self.token);
 			let url=Path.toApi(self.options());
 			if (self.ns=='gitlab') url+="?ref="+self.branch;
 			fetch(url,{
@@ -68,7 +65,7 @@ module.exports=class GITROWS{
 					"branch":self.branch
 				};
 				if (typeof obj!='undefined'&&obj)
-					data.content=btoa(self.type.toLowerCase()=='csv'?CSV.stringify(obj,{header:true}):JSON.stringify(obj));
+					data.content=Util.btoa(self.type.toLowerCase()=='csv'?CSV.stringify(obj,{header:true}):JSON.stringify(obj));
 				if (typeof sha!='undefined')
 					data.sha=sha;
 				let headers={
@@ -83,7 +80,7 @@ module.exports=class GITROWS{
 						data.author_email=self.author.email;
 						break;
 					default:
-						headers['Authorization']="Basic " + btoa(self.user + ":" + self.token);
+						headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
 						data.message=self.message;
 						data.committer=self.author;
 				}
@@ -154,7 +151,7 @@ module.exports=class GITROWS{
 			self.pull(path)
 			.then(
 				d=>{
-					base=self.parseContent(atob(d.content));
+					base=self.parseContent(Util.atob(d.content));
 					if (self.strict){
 						self.columns=self.columns||Util.columns(base);
 						data=Util.columnsApply(data,self.columns,self.default);
@@ -185,7 +182,7 @@ module.exports=class GITROWS{
 			self.pull(pathData)
 			.then(
 				d=>{
-					base=self.parseContent(atob(d.content));
+					base=self.parseContent(Util.atob(d.content));
 					let data=Util.where(base,{id:'not:'+id});
 					if (JSON.stringify(base) !== JSON.stringify(data))
 						self.push(path,data,d.sha).then(r=>resolve(r)).catch(e=>reject(e));

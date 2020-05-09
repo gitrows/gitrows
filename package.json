@@ -7,9 +7,10 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean && mkdir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-umd": "BABEL_ENV=umd babel gitrows.js -o dist/gitrows.umd.js",
-		"build-umd-path": "BABEL_ENV=umd babel lib/path.js -o dist/utils/path.umd.js",
-    "build": "npm run build-umd && npm run build-umd-path"
+    "build-umd-path": "BABEL_ENV=umd babel lib/path.js -o dist/utils/path.umd.js",
+    "build": "npm run dist && npm run build-umd-path",
+		"postbuild":"cp -r dist/ ../../Websites/gitrows.com/assets/js",
+    "dist": "webpack"
   },
   "repository": {
     "type": "git",
@@ -26,13 +27,12 @@
     "csv"
   ],
   "author": "Nicolas Zimmer",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/gitrows/gitrows/issues"
   },
   "homepage": "https://github.com/gitrows/gitrows#readme",
   "dependencies": {
-    "base-64": "^0.1.0",
     "csv-parse": "^4.9.0",
     "csv-stringify": "^5.5.0",
     "node-fetch": "^2.6.0"
@@ -44,6 +44,11 @@
     "@babel/plugin-transform-modules-umd": "^7.9.0",
     "@babel/plugin-transform-named-capturing-groups-regex": "^7.8.3",
     "@babel/preset-env": "^7.9.6",
-    "babel-preset-github": "^3.2.1"
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.1.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-github": "^3.2.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
   }
 }

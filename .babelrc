@@ -1,22 +1,11 @@
 {
   "env": {
-    "esm": {
-      "presets": [
-				"github"
-			]
-    },
     "umd": {
       "plugins": [
-        ["@babel/plugin-transform-modules-umd", {
-          "globals": {
-            "selector-set": "SelectorSet"
-          }
-        }],
-				["@babel/plugin-transform-named-capturing-groups-regex"],
-    		["@babel/plugin-transform-unicode-regex"]
+        ["@babel/plugin-transform-modules-umd"]
       ],
-      "moduleId": "gitrows",
-      "presets": ["github"]
-    }
-  }
+      "presets": ["@babel/preset-env"]
+    },
+  },
+	"presets": ["@babel/preset-env"]
 }
