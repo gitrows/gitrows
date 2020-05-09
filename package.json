@@ -1,6 +1,6 @@
 {
   "name": "gitrows",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Use git repos as CRUD data storage",
   "main": "gitrows.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-umd-path": "BABEL_ENV=umd babel lib/path.js -o dist/utils/path.umd.js",
     "build": "npm run dist && npm run build-umd-path",
-		"postbuild":"cp -r dist/ ../../Websites/gitrows.com/assets/js",
+    "postbuild": "cp -r dist/ ../../Websites/gitrows.com/assets/js",
     "dist": "webpack"
   },
   "repository": {
