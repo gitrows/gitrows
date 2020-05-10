@@ -7,8 +7,8 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean && mkdir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-umd-path": "BABEL_ENV=umd babel lib/path.js -o dist/utils/path.umd.js",
-    "build": "npm run dist && npm run build-umd-path",
+    "build-umd": "BABEL_ENV=umd babel src/** -d lib",
+    "build": "npm run build-umd && npm run dist",
     "postbuild": "cp -r dist/ ../../Websites/gitrows.com/assets/js",
     "dist": "webpack"
   },
