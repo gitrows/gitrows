@@ -7,10 +7,10 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean && mkdir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-umd": "BABEL_ENV=umd babel src/** -d lib",
+    "build-umd": "BABEL_ENV=umd babel src/** -d dist/utils",
     "build": "npm run build-umd && npm run dist",
     "postbuild": "cp -r dist/ ../../Websites/gitrows.com/assets/js",
-    "dist": "webpack"
+    "dist": "BABEL_ENV=node babel src/** -d lib && webpack"
   },
   "repository": {
     "type": "git",
@@ -46,6 +46,7 @@
     "@babel/preset-env": "^7.9.6",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.1.0",
+    "babel-plugin-add-module-exports": "^1.0.2",
     "babel-preset-env": "^1.7.0",
     "babel-preset-github": "^3.2.1",
     "webpack": "^4.43.0",

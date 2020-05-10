@@ -1,39 +1,44 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define([], factory);
+    define(["exports"], factory);
   } else if (typeof exports !== "undefined") {
-    factory();
+    factory(exports);
   } else {
     var mod = {
       exports: {}
     };
-    factory();
-    global.path = mod.exports;
+    factory(mod.exports);
+    global.gitpath = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports) {
   "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports["default"] = void 0;
 
   function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-  var Path = {
+  var GitPath = {
     parse: function parse(path) {
       if (_typeof(path) == 'object') return path;
 
-      if (Path.isUrl(path)) {
-        return Path._parseUrl(path);
+      if (GitPath.isUrl(path)) {
+        return GitPath._parseUrl(path);
       }
 
-      return Path._parsePath(path);
+      return GitPath._parsePath(path);
     },
     _parsePath: function _parsePath(path) {
       //@see: https://regex101.com/r/DwLNHW/5
       var regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-]+)(?:(?:#)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
-      return Path._execRegex(regex, path);
+      return GitPath._execRegex(regex, path);
     },
     _parseUrl: function _parseUrl(url) {
       //@see https://regex101.com/r/S9zzb9/3
       var regex = /http(?:s?):\/\/(github|gitlab).com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/)([\w]+)\/)?([\w\/\-\.]+\.(json|csv))/gm;
-      return Path._execRegex(regex, url);
+      return GitPath._execRegex(regex, url);
     },
     _execRegex: function _execRegex(regex, str) {
       var m,
@@ -53,16 +58,16 @@
       return groups;
     },
     fromUrl: function fromUrl(url) {
-      var data = Path._parseUrl(url);
+      var data = GitPath._parseUrl(url);
 
-      if (!Path.isValid(data)) return null;
+      if (!GitPath.isValid(data)) return null;
       data.branch = data.branch ? '#' + data.branch : '';
       return "@".concat(data.ns, "/").concat(data.owner, "/").concat(data.repo).concat(data.branch, "/").concat(data.path);
     },
     toUrl: function toUrl(path) {
       var raw = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var data = _typeof(path) == 'object' ? path : Path.parse(path);
-      if (!Path.isValid(data)) return null;
+      var data = _typeof(path) == 'object' ? path : GitPath.parse(path);
+      if (!GitPath.isValid(data)) return null;
       data.branch = data.branch || 'master';
 
       if (!data.ns || data.ns == 'github') {
@@ -76,8 +81,8 @@
       return "https://".concat(data.server, "/").concat(data.owner, "/").concat(data.repo, "/-/").concat(data.format, "/").concat(data.branch, "/").concat(data.path);
     },
     toApi: function toApi(path) {
-      var data = _typeof(path) == 'object' ? path : Path.parse(path);
-      if (!Path.isValid(data)) return null;
+      var data = _typeof(path) == 'object' ? path : GitPath.parse(path);
+      if (!GitPath.isValid(data)) return null;
 
       if (!data.ns || data.ns == 'github') {
         data.server = 'api.github.com';
@@ -104,5 +109,6 @@
       return regex.test(url);
     }
   };
-  module.exports = Path;
+  var _default = GitPath;
+  _exports["default"] = _default;
 });

@@ -1,20 +1,20 @@
-const Path={
+const GitPath={
 	parse:(path)=>{
 		if (typeof path=='object') return path;
-		if (Path.isUrl(path)){
-			return Path._parseUrl(path);
+		if (GitPath.isUrl(path)){
+			return GitPath._parseUrl(path);
 		}
-		return Path._parsePath(path);
+		return GitPath._parsePath(path);
 	},
 	_parsePath:(path)=>{
 		//@see: https://regex101.com/r/DwLNHW/5
 		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-]+)(?:(?:#)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
-		return Path._execRegex(regex,path);
+		return GitPath._execRegex(regex,path);
 	},
 	_parseUrl:(url)=>{
 		//@see https://regex101.com/r/S9zzb9/3
 		const regex = /http(?:s?):\/\/(github|gitlab).com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/)([\w]+)\/)?([\w\/\-\.]+\.(json|csv))/gm;
-		return Path._execRegex(regex,url);
+		return GitPath._execRegex(regex,url);
 	},
 	_execRegex:(regex,str)=>{
 		let m, groups={},map=['valid','ns','owner','repo','branch','path','type','resource']
@@ -29,14 +29,14 @@ const Path={
 		return groups;
 	},
 	fromUrl:(url)=>{
-		let data=Path._parseUrl(url);
-		if (!Path.isValid(data)) return null;
+		let data=GitPath._parseUrl(url);
+		if (!GitPath.isValid(data)) return null;
 		data.branch=data.branch?'#'+data.branch:'';
 		return `@${data.ns}/${data.owner}/${data.repo}${data.branch}/${data.path}`;
 	},
 	toUrl:(path,raw=false)=>{
-		let data=typeof path=='object'?path:Path.parse(path);
-		if (!Path.isValid(data)) return null;
+		let data=typeof path=='object'?path:GitPath.parse(path);
+		if (!GitPath.isValid(data)) return null;
 		data.branch=data.branch||'master';
 		if (!data.ns||data.ns=='github'){
 			data.server=raw?'raw.githubusercontent.com':'github.com';
@@ -48,8 +48,8 @@ const Path={
 		return `https://${data.server}/${data.owner}/${data.repo}/-/${data.format}/${data.branch}/${data.path}`;
 	},
 	toApi:(path)=>{
-		let data=typeof path=='object'?path:Path.parse(path);
-		if (!Path.isValid(data)) return null;
+		let data=typeof path=='object'?path:GitPath.parse(path);
+		if (!GitPath.isValid(data)) return null;
 		if (!data.ns||data.ns=='github'){
 			data.server='api.github.com';
 			return `https://${data.server}/repos/${data.owner}/${data.repo}/contents/${data.path}`;
@@ -72,4 +72,4 @@ const Path={
 		return regex.test(url);
 	}
 }
-module.exports=Path;
+export default GitPath

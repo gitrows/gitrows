@@ -1,11 +1,11 @@
 {
   "env": {
     "umd": {
-      "plugins": [
-        ["@babel/plugin-transform-modules-umd"]
-      ],
-      "presets": ["@babel/preset-env"]
+      "plugins": ["@babel/plugin-transform-modules-umd"],
     },
+		"node":{
+			"plugins": ["add-module-exports"]
+		}
   },
-	"presets": ["@babel/preset-env"]
+	"presets": ["@babel/preset-env"],
 }

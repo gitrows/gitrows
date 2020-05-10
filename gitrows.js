@@ -7,7 +7,7 @@ const CSV = {
 
 const Response=require('./lib/response.js');
 const Util=require('./lib/util.js');
-const Path=require('./lib/path.js');
+const GitPath=require('./lib/gitpath.js');
 
 module.exports=class Gitrows{
 	constructor(options){
@@ -35,13 +35,13 @@ module.exports=class Gitrows{
 		let self=this;
 		return new Promise(function(resolve, reject) {
 			let headers={};
-			const pathData=Path.parse(path)||{};
+			const pathData=GitPath.parse(path)||{};
 			if (!pathData.path) reject(Response(400));
 			self.options(pathData);
-			if(!Path.isValid(self.options())) reject(Response(400));
+			if(!GitPath.isValid(self.options())) reject(Response(400));
 			if (self.user!==undefined&&self.token!==undefined&&self.ns=='github')
 				headers["Authorization"]="Basic "+Util.btoa(self.user+":"+self.token);
-			let url=Path.toApi(self.options());
+			let url=GitPath.toApi(self.options());
 			if (self.ns=='gitlab') url+="?ref="+self.branch;
 			fetch(url,{
 				headers: headers,
@@ -57,10 +57,10 @@ module.exports=class Gitrows{
 			let self=this;
 			return new Promise(function(resolve, reject) {
 				if (!self.token) reject(Response(401));
-				const pathData=Path.parse(path)||{};
+				const pathData=GitPath.parse(path)||{};
 				if (!pathData.path) reject(Response(400));
 				self.options(pathData);
-				if(!Path.isValid(self.options())) reject(Response(400));
+				if(!GitPath.isValid(self.options())) reject(Response(400));
 				let data={
 					"branch":self.branch
 				};
@@ -84,7 +84,7 @@ module.exports=class Gitrows{
 						data.message=self.message;
 						data.committer=self.author;
 				}
-				let url=Path.toApi(self.options());
+				let url=GitPath.toApi(self.options());
 				fetch(url,{
 					method:method,
 					headers: headers,
@@ -111,15 +111,15 @@ module.exports=class Gitrows{
 	get(path,query){
 		let self=this;
 		return new Promise(function(resolve, reject) {
-			const pathData=Path.parse(path)||{};
+			const pathData=GitPath.parse(path)||{};
 			if (!pathData.path) reject(Response(400));
 			self.options(pathData);
-			if(!Path.isValid(self.options())) reject(Response(400));
+			if(!GitPath.isValid(self.options())) reject(Response(400));
 			if (pathData.resource){
 				query=query||{};
 				query.id=pathData.resource;
 			}
-			const url=Path.toUrl(self.options(),true);
+			const url=GitPath.toUrl(self.options(),true);
 			return fetch(url)
 			.then(
 				r=>{
@@ -175,7 +175,7 @@ module.exports=class Gitrows{
 	delete(path,id){
 		let self=this,base=[];
 		return new Promise(function(resolve, reject) {
-			const pathData=Path.parse(path);
+			const pathData=GitPath.parse(path);
 			self.options(pathData);
 			if (pathData.resource&&typeof id=='undefined')
 				id=pathData.resource;
