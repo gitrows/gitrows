@@ -12,8 +12,8 @@ const GitPath={
 		return GitPath._execRegex(regex,path);
 	},
 	_parseUrl:(url)=>{
-		//@see https://regex101.com/r/S9zzb9/3
-		const regex = /http(?:s?):\/\/(github|gitlab).com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/)([\w]+)\/)?([\w\/\-\.]+\.(json|csv))/gm;
+		//@see https://regex101.com/r/S9zzb9/4
+		const regex = /https?:\/\/[\w\.]*(github|gitlab)[\w]*.com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/)?([\w]+)\/)([\w\/\-\.]+.(?:json|csv))/gm;
 		return GitPath._execRegex(regex,url);
 	},
 	_execRegex:(regex,str)=>{
