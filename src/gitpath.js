@@ -8,12 +8,12 @@ const GitPath={
 	},
 	_parsePath:(path)=>{
 		//@see: https://regex101.com/r/DwLNHW/5
-		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-]+)(?:(?:#)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
+		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?:#)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
 		return GitPath._execRegex(regex,path);
 	},
 	_parseUrl:(url)=>{
-		//@see https://regex101.com/r/S9zzb9/4
-		const regex = /https?:\/\/[\w\.]*(github|gitlab)[\w]*.com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/)?([\w]+)\/)([\w\/\-\.]+.(?:json|csv))/gm;
+		//@see https://regex101.com/r/S9zzb9/5
+		const regex = /https?:\/\/[\w\.]*(github|gitlab)[\w]*.com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/|raw\/)?([\w]+)\/)([\w\/\-\.]+.(?:json|csv))/gm;
 		return GitPath._execRegex(regex,url);
 	},
 	_execRegex:(regex,str)=>{
@@ -61,7 +61,7 @@ const GitPath={
 	},
 	isValid:(obj)=>{
 		let mandatory=['ns','owner','repo','path'];
-		return mandatory.every(x=>x in obj);
+		return mandatory.every(x=>x in obj&&obj[x]);
 	},
 	isUrl:(url)=>{
 		/*
