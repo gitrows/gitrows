@@ -73,7 +73,7 @@ The API style got it's name from its use with the free GitRows API tool which al
 https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv)
 ```
 
-Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json If you are unsure about how a file url is translated into API style, you can use GitRow's (Linter and Converter Tool)[https://gitrows.com/linter] to check and translate repo and API paths respectively.
+Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json If you are unsure about how a file url is translated into API style, you can use GitRow's [Linter and Converter Tool](https://gitrows.com/linter) to check and translate repo and API paths respectively.
 
 ### get(path[, filter])
 The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
