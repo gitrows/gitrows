@@ -32,7 +32,7 @@
     },
     _parsePath: function _parsePath(path) {
       //@see: https://regex101.com/r/DwLNHW/5
-      var regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?:#)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
+      var regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?::)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
       return GitPath._execRegex(regex, path);
     },
     _parseUrl: function _parseUrl(url) {
@@ -61,7 +61,7 @@
       var data = GitPath._parseUrl(url);
 
       if (!GitPath.isValid(data)) return null;
-      data.branch = data.branch ? '#' + data.branch : '';
+      data.branch = data.branch ? ':' + data.branch : '';
       return "@".concat(data.ns, "/").concat(data.owner, "/").concat(data.repo).concat(data.branch, "/").concat(data.path);
     },
     toUrl: function toUrl(path) {

@@ -53,10 +53,10 @@ https://github.com/gitrows/data/blob/master/iris.json
 or use the GitRows API style:
 
 ```
-@namespace/owner/repository#branch/directory/file(.json|.csv)
+@namespace/owner/repository:branch/directory/file(.json|.csv)
 ```
 
-`@namespace` and `#branch` are optional and default to `github` and `master`, if you want to access a GitLab repository, use the `gitlab` namespace.
+`@namespace` and `:branch` are optional and default to `github` and `master`, if you want to access a GitLab repository, use the `gitlab` namespace.
 
 
 *Which notation to use?*

@@ -8,7 +8,7 @@ const GitPath={
 	},
 	_parsePath:(path)=>{
 		//@see: https://regex101.com/r/DwLNHW/5
-		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?:#)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
+		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?::)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
 		return GitPath._execRegex(regex,path);
 	},
 	_parseUrl:(url)=>{
@@ -31,7 +31,7 @@ const GitPath={
 	fromUrl:(url)=>{
 		let data=GitPath._parseUrl(url);
 		if (!GitPath.isValid(data)) return null;
-		data.branch=data.branch?'#'+data.branch:'';
+		data.branch=data.branch?':'+data.branch:'';
 		return `@${data.ns}/${data.owner}/${data.repo}${data.branch}/${data.path}`;
 	},
 	toUrl:(path,raw=false)=>{
