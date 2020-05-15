@@ -30,7 +30,7 @@ const Gitrows = require('gitrows');
 // Init the GitRows client, you can provide options at this point, later or just run on the defaults
 const gitrows = new Gitrows();
 
-let path = '@github/nicolaszimmer/test-data/test.json';
+let path = '@github/gitrows/data/iris.json';
 
 gitrows.get(path)
  .then( (data) => {
@@ -47,7 +47,7 @@ gitrows.get(path)
 To select the data file you can either paste the GitHub/GitLab file url from the browser, e.g.
 
 ```url
-https://github.com/nicolaszimmer/test-data/blob/master/test.json
+https://github.com/gitrows/data/blob/master/iris.json
 ```
 
 or use the GitRows API style:
@@ -73,7 +73,7 @@ The API style got it's name from its use with the free GitRows API tool which al
 https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv)
 ```
 
-Give it a try with our sample database from the basic use example: https://api.gitrows.com/nicolaszimmer/test-data/test.json If you are unsure about how a file url is translated into API style, you can use GitRow's [Linter and Converter Tool](https://gitrows.com/linter) to check and translate repo and API paths respectively.
+Give it a try with our sample database from the basic use example: https://api.gitrows.com/@github/gitrows/data/iris.json If you are unsure about how a file url is translated into API style, you can use GitRow's [Linter and Converter Tool](https://gitrows.com/linter) to check and translate repo and API paths respectively.
 
 ### get(path[, filter])
 The `get` method accepts as a second argument a filter object that compares keys and the corresponding values:
