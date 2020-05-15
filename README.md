@@ -89,7 +89,7 @@ For simple matching if a value is present (e.g. an id) supply the field key and 
 
 * `not:`	equals not
 * `lt:`		less than
-* `lte:`	less than
+* `lte:`	less than or equal
 * `gt:`		greater than
 * `gte:`	greater than or equal
 * `^:`		starts with, alias: `starts:`
