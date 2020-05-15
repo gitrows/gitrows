@@ -70,7 +70,7 @@ Although it's easier for a simple query to just paste the url I strongly encoura
 The API style got it's name from its use with the free GitRows API tool which allows you to query all public repos with a consistent api call:
 
 ```
-https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv)
+https://api.gitrows.com/@namespace/owner/repository:branch/path/file(.json|.csv)
 ```
 
 Give it a try with our sample database from the basic use example: https://api.gitrows.com/@github/gitrows/data/iris.json If you are unsure about how a file url is translated into API style, you can use GitRow's [Linter and Converter Tool](https://gitrows.com/linter) to check and translate repo and API paths respectively.
@@ -183,7 +183,7 @@ gitrows.delete(path,remove)
 If you use the API style you may also append the `id` to the path and omit the second argument:
 
 ```
-@namespace/owner/repository#branch/directory/file(.json|.csv)/id
+@namespace/owner/repository:branch/directory/file(.json|.csv)/id
 ```
 
 ### create(path[ ,data])

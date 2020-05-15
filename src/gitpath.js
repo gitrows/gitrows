@@ -31,7 +31,7 @@ const GitPath={
 	fromUrl:(url)=>{
 		let data=GitPath._parseUrl(url);
 		if (!GitPath.isValid(data)) return null;
-		data.branch=data.branch?':'+data.branch:'';
+		data.branch=data.branch&&data.branch!='master'?':'+data.branch:'';
 		return `@${data.ns}/${data.owner}/${data.repo}${data.branch}/${data.path}`;
 	},
 	toUrl:(path,raw=false)=>{
