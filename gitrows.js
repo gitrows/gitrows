@@ -145,7 +145,7 @@ module.exports=class Gitrows{
 			.catch(f=>console.log(f));
 		});
 	}
-	add(path,data){
+	put(path,data){
 		let self=this,base=[],columns;
 		return new Promise(function(resolve, reject) {
 			self.pull(path)
@@ -172,23 +172,51 @@ module.exports=class Gitrows{
 			.finally(resolve(Response(200)));
 		});
 	}
-	delete(path,id){
+	update(path,data,query){
+		let self=this,base=[],columns;
+		const pathData=GitPath.parse(path)||{};
+		return new Promise(function(resolve, reject) {
+			self.pull(path)
+			.then(
+				d=>{
+					base=self.parseContent(Util.atob(d.content));
+					if (self.strict){
+						self.columns=self.columns||Util.columns(base);
+						base=Util.columnsApply(base,self.columns,self.default);
+					}
+					if (pathData.resource){
+						query=query||{};
+						query.id=pathData.resource;
+					}
+					if (typeof query=='undefined') resolve(Response(304));
+					if (!Array.isArray(base))
+						base=[base];
+					base=Util.valuesApply(base,data,query);
+					self.push(path,base,d.sha).then(r=>resolve(Response(202))).catch(e=>e);
+				}
+			);
+		});
+	}
+	delete(path,query){
 		let self=this,base=[];
 		return new Promise(function(resolve, reject) {
 			const pathData=GitPath.parse(path);
 			self.options(pathData);
-			if (pathData.resource&&typeof id=='undefined')
-				id=pathData.resource;
+			if (pathData.resource){
+				query=query||{};
+				query.id=pathData.resource;
+			};
+			if (typeof query=='undefined') resolve(Response(304));
 			self.pull(pathData)
 			.then(
 				d=>{
 					base=self.parseContent(Util.atob(d.content));
-					let data=Util.where(base,{id:'not:'+id});
+					const diff=Util.where(base,query);
+					const data = base.filter(x => !diff.includes(x));
 					if (JSON.stringify(base) !== JSON.stringify(data))
-						self.push(path,data,d.sha).then(r=>resolve(r)).catch(e=>reject(e));
+						self.push(path,data,d.sha).then(r=>resolve(Response(204))).catch(e=>e);
 				}
-			)
-			.finally(resolve(base));
+			);
 		});
 	}
  	getColumns(path){
