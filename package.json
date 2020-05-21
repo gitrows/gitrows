@@ -8,8 +8,9 @@
     "prebuild": "npm run clean && mkdir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-umd": "BABEL_ENV=umd babel src/** -d dist/utils",
-    "build": "npm run build-umd && npm run dist",
-    "postbuild": "cp -r dist/ ../../Websites/gitrows.com/assets/js",
+    "build": "npm run build-umd && npm run dist && npm run readme",
+		"readme":"cat docs/js/*.md > README.md",
+    "postbuild": "cp -r dist/ ../../Websites/gitrows.com/assets/js && cp -r docs/js/ ../../Websites/gitrows.com/pages/docs/js/src && cp -r docs/api/ ../../Websites/gitrows.com/pages/docs/api/src",
     "dist": "BABEL_ENV=node babel src/** -d lib && webpack"
   },
   "repository": {

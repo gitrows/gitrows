@@ -115,7 +115,7 @@ To read the complete data set from a `.json` or `.csv` file you pass the file pa
 @namespace/owner/repository:branch/directory/file(.json|.csv)
 ```
 
-Alternatively you can copy the file url form your browser and pass this instead. Read more about the path structure and how to troubleshoot in the [Path section](#path) of GitRows' documentation.
+Alternatively you can copy the file url form your browser and pass this instead. Read more about the path structure and how to troubleshoot in the [Path section](https://gitrows.com/docs/js/path) of GitRows' documentation.
 
 ```js
 const path = '@github/gitrows/data/iris.json';
@@ -130,7 +130,7 @@ gitrows.get(path)
  });
 ```
 
-The `get` method accepts as a second argument a filter object which can be used with filtering and aggregation operators. Learn more about the possibilities in the [Filters section](#filters).
+The `get` method accepts as a second argument a filter object which can be used with filtering and aggregation operators. Learn more about the possibilities in the [Filters section](http://gitrows.com/docs/js/filters).
 
 ## put(path, *object* data)
 > requires `token`
