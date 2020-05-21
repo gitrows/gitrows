@@ -30,11 +30,11 @@ https://api.gitrows.com/@github/gitrows/data/iris.json?petalLength=lt:1.5
 
 Instead of retrieving data entries you can use aggregate functions that are prefixed with the dollar sign `$` and followed by the column name:
 
-* `'$count':'*'`	counts the records in the data set
-* `'$avg':'columnName'`	calculates the average of all numeric values in `columnName`
-* `'$sum':'columnName'`	calculates the sum of all numeric values in `columnName`
-* `'$min':'columnName'`	returns the smallest of all numeric values in `columnName`
-* `'$max':'columnName'`	returns the largest of all numeric values in `columnName`
+* `$count='*'`	counts the records in the data set
+* `$avg='columnName'`	calculates the average of all numeric values in `columnName`
+* `$sum='columnName'`	calculates the sum of all numeric values in `columnName`
+* `$min='columnName'`	returns the smallest of all numeric values in `columnName`
+* `$max='columnName'`	returns the largest of all numeric values in `columnName`
 
 All filters are applied before the aggregation, so for example to get the average of all values larger than a certain number you can use  `value=lt:number&$avg=value`.
 
@@ -56,7 +56,7 @@ https://api.gitrows.com/@github/gitrows/data/iris.json?$select=petalLength,petal
 
 ## Sorting Results
 
-You can order the result with `$order:'columnName:asc` or `$order:'columnName:desc` respectively and `$limit` the entries returned:
+You can order the result with `$order='columnName:asc'` or `$order='columnName:desc'` respectively and `$limit` the entries returned:
 
 Example:
 
