@@ -37,7 +37,7 @@
     },
     _parseUrl: function _parseUrl(url) {
       //@see https://regex101.com/r/S9zzb9/5
-      var regex = /https?:\/\/[\w\.]*(github|gitlab)[\w]*.com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/|raw\/)?([\w]+)\/)([\w\/\-\.]+.(?:json|csv))/gm;
+      var regex = /https?:\/\/[\w\.]*(github|gitlab)[\w]*.com\/([\w-]+)\/([\w-\.]+)\/(?:(?:-\/)?(?:blob\/|raw\/)?([\w]+)\/)([\w\/\-\.]+\.([\w]+))/gm;
       return GitPath._execRegex(regex, url);
     },
     _execRegex: function _execRegex(regex, str) {
@@ -55,6 +55,7 @@
         });
       }
 
+      groups.valid = GitPath.isValid(groups);
       return groups;
     },
     fromUrl: function fromUrl(url) {
@@ -95,6 +96,7 @@
       return "https://".concat(data.server, "/api/v4/projects/").concat(data.project, "/repository/files/").concat(data.path);
     },
     isValid: function isValid(obj) {
+      if (typeof obj.type == 'undefined' || !['csv', 'json'].includes(obj.type.toLowerCase())) return false;
       var mandatory = ['ns', 'owner', 'repo', 'path'];
       return mandatory.every(function (x) {
         return x in obj && obj[x];
