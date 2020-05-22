@@ -1,6 +1,6 @@
 {
   "name": "gitrows",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Use git repos as CRUD data storage",
   "main": "gitrows.js",
   "scripts": {
