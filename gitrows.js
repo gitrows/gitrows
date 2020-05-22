@@ -94,7 +94,6 @@ module.exports=class Gitrows{
 					if (!r.ok) reject(Response(r.status));
 					resolve(Response(r.status));
 				})
-					//resolve(method!=='DELETE'?r.json():Response(r.status));
 				.catch((e) => console.error('Error:', e));
 			});
 	}
@@ -123,8 +122,12 @@ module.exports=class Gitrows{
 			return fetch(url)
 			.then(
 				r=>{
-					if (!r.ok) reject(Response(r.status));
-					return r.text();
+					if (r.ok) return r.text();
+					//retry by api if token is present
+					if (self.user!==undefined&&self.token!==undefined&&self.ns=='github'){
+						return self.pull(path).then(p=>Util.atob(p.content)).catch(e=>reject(e));
+					}
+					reject(Response(r.status));
 				}
 			)
 			.then(t=>{
