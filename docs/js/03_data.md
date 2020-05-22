@@ -26,7 +26,7 @@ gitrows.get(path)
  });
 ```
 
-The `get` method accepts as a second argument a filter object which can be used with filtering and aggregation operators. Learn more about the possibilities in the [Filters section](http://gitrows.com/docs/js/filters).
+The `get` method accepts as a second argument a filter object which can be used with filtering and aggregation operators. Learn more about the possibilities in the [Filters section](https://gitrows.com/docs/js/filters).
 
 ## put(path, *object* data)
 > requires `token`

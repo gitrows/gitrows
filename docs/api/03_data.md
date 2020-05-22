@@ -1,33 +1,39 @@
 
 # Working with Data
 
-GitRows implements a full CRUD interface to you data so you can create, read, update, and delete information in your repository data files.
+GitRows implements a full CRUD interface to you data so you can create, read, update, and delete information in your repository data files. In the current version you can only read public data files with the GitRows API. If need to access other methods or private repos you can join the private beta by sending an email to beta@gitrows.com or use the [js module](https://gitrows.com/docs/js/data) instead.
 
-## get(path[, *object* filter])
+## GET
 
-To read the complete data set from a `.json` or `.csv` file you pass the file path to the `.get()` method, which has the basic structure of
+To read the complete data set from a `.json` or `.csv` file you make a get request to the API which has the basic structure of
 
 ```
-@namespace/owner/repository:branch/directory/file(.json|.csv)
+https://api.gitrows.com/@namespace/owner/repository:branch/directory/file(.json|.csv)
 ```
 
-Alternatively you can copy the file url form your browser and pass this instead. Read more about the path structure and how to troubleshoot in the [Path section](https://gitrows.com/docs/js/path) of GitRows' documentation.
+Read more about the path structure and how to troubleshoot in the [Path section](https://gitrows.com/docs/api/path) of GitRows' documentation.
 
-```js
-const path = '@github/gitrows/data/iris.json';
+```shell
+curl -i -X GET https://api.gitrows.com/@github/gitrows/data/iris.json
+HTTP/2 200
+date: Fri, 22 May 2020 12:42:25 GMT
+content-type: application/json
+content-length: 13859
+access-control-allow-origin: *
+server: GitRows API Server
 
-gitrows.get(path)
- .then( (data) => {
-  //handle (Array/Object)data
-  console.log(data);
- })
- .catch( (error) => {
-  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
- });
+[{"sepalLength":5.1,"sepalWidth":3.5,"petalLength":1.4,"petalWidth":0.2,"species":"setosa"},...]
 ```
 
-The `get` method accepts as a second argument a filter object which can be used with filtering and aggregation operators. Learn more about the possibilities in the [Filters section](http://gitrows.com/docs/js/filters).
+You can add filtering and aggregation operators as query strings, e.g. `?species=setosa`. Learn more about the available options in the [Filters section](http://gitrows.com/docs/api/filters).
 
+### Try the API
+
+You can try the API with the API Explorer:
+
+<div id="api-console" class="py-4" data-method="get"></div>
+
+<!---
 ## put(path, *object* data)
 > requires `token`
 
@@ -129,3 +135,4 @@ If you use the API style you may also append the `id` to the path and omit the s
 ```
 @namespace/owner/repository:branch/directory/file(.json|.csv)/id
 ```
+-->
