@@ -133,15 +133,7 @@ module.exports=class Gitrows{
 			.then(t=>{
 				let data=self.parseContent(t);
 				if (data&&typeof query != 'undefined'){
-					data=Util.where(data,query);
-					let aggregates=Object.keys(query)
-					  .filter(key => key.startsWith('$'))
-					  .reduce((obj, key) => {
-					    obj[key] = query[key];
-					    return obj;
-					  }, {});
-					if(Object.keys(aggregates).length)
-						data=Util.aggregate(data,aggregates);
+					data=Gitrows._applyFilters(data,query);
 				}
 				resolve(data);
 			})
@@ -257,5 +249,17 @@ module.exports=class Gitrows{
 			if (allowed.includes(key)&&typeof obj[key]!=='undefined') this[key]=obj[key];
 		}
 		return self;
+	}
+	static _applyFilters(data,query){
+		data=Util.where(data,query);
+		let aggregates=Object.keys(query)
+			.filter(key => key.startsWith('$'))
+			.reduce((obj, key) => {
+				obj[key] = query[key];
+				return obj;
+			}, {});
+		if(Object.keys(aggregates).length)
+			data=Util.aggregate(data,aggregates);
+			return data;
 	}
 }

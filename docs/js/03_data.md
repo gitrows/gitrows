@@ -4,6 +4,7 @@
 GitRows implements a full CRUD interface to you data so you can create, read, update, and delete information in your repository data files.
 
 ## get(path[, *object* filter])
+> requires `token` for **private repos only**
 
 To read the complete data set from a `.json` or `.csv` file you pass the file path to the `.get()` method, which has the basic structure of
 
@@ -27,6 +28,8 @@ gitrows.get(path)
 ```
 
 The `get` method accepts as a second argument a filter object which can be used with filtering and aggregation operators. Learn more about the possibilities in the [Filters section](https://gitrows.com/docs/js/filters).
+
+**For reading a file from a private repo you must set your username and token (see put() for more details). Please note that its impossible to decide from the returned status code if the file is private on GitHub or not, as it will always be 404 by GitHub's policy.**
 
 ## put(path, *object* data)
 > requires `token`
