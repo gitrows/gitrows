@@ -218,24 +218,6 @@ module.exports=class Gitrows{
  	getColumns(path){
 		return this.get(path).then(data=>Util.columns(data));
 	}
-	/*parseContent(content){
-		let self=this;
-		let data=null;
-		try {
-			data=JSON.parse(content);
-			self.type='json';
-		} catch (e) {
-			try {
-				data=CSV.parse(content,{
-				  columns: true,
-				  skip_empty_lines: true
-				});
-				self.type='csv';
-			} catch (e){}
-		} finally {
-			return data;
-		}
-	}*/
 	options(obj){
 		let self=this;
 		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv','type','columns','strict','default'];

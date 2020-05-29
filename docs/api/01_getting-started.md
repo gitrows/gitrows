@@ -3,14 +3,14 @@
 
 ## What is GitRows?
 
-GitRows makes it easy to use and store data in GitHub and GitLab repos. You can read data stored in `.csv` and `.json` files from **all public repos** and read, create, update and delete data in **public or private repos** that you have access to, all with the benefit of version control.
+GitRows makes it easy to use and store data in GitHub and GitLab repos. You can read data stored in `.csv` and `.json` files from **all public repos** and read, create, update and delete data in **public or private repos** that you have access to, all with the benefit of version control. GitRows also supports basic `.yaml` file operations, mainly for reading and writing [OpenAPI documents](http://spec.openapis.org/oas/v3.0.3).
 
 ## Installation
 
 GitRows provides a free REST API to all public repositories on GitHub and GitLab. The API url is always in the format:
 
 ```shell
-https://api.gitrows.com/@namespace/owner/repository/path/to/file(.json|.csv)
+https://api.gitrows.com/@namespace/owner/repository/path/to/file(.json|.csv|.yaml)
 ```
 
 You can easily convert any file url or check your API Path with the [Linter and Converter Tool](https://gitrows.com/linter).
@@ -32,7 +32,7 @@ date: Thu, 21 May 2020 13:12:41 GMT
 content-type: application/json
 content-length: 13859
 access-control-allow-origin: *
-server: GitRows API Server
+server: GitRows API Server 1/0
 
 [{"sepalLength":5.1,"sepalWidth":3.5,"petalLength":1.4,"petalWidth":0.2,"species":"setosa"}, ... ]
 ```

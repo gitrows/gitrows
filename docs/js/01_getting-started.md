@@ -3,7 +3,7 @@
 
 ## What is GitRows?
 
-GitRows makes it easy to use and store data in GitHub and GitLab repos. You can read data stored in `.csv` and `.json` files from **all public repos** and read, create, update and delete data in **public or private repos** that you have access to, all with the benefit of version control.
+GitRows makes it easy to use and store data in GitHub and GitLab repos. You can read data stored in `.csv` and `.json` files from **all public repos** and read, create, update and delete data in **public or private repos** that you have access to, all with the benefit of version control. GitRows also supports basic `.yaml` file operations, mainly for reading and writing [OpenAPI documents](http://spec.openapis.org/oas/v3.0.3).
 
 GitRows works with `node` and in any modern `browser`. Alternatively [learn more](https://gitrows.com/docs/api/getting-started) how to use GitRows' free API to integrate data into your websites/apps.
 
