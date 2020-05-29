@@ -8,7 +8,7 @@ const GitPath={
 	},
 	_parsePath:(path)=>{
 		//@see: https://regex101.com/r/DwLNHW/5
-		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?::)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
+		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?::)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv|yaml))(?:\/([\w]+))?/mg;
 		return GitPath._execRegex(regex,path);
 	},
 	_parseUrl:(url)=>{
@@ -61,7 +61,7 @@ const GitPath={
 		return `https://${data.server}/api/v4/projects/${data.project}/repository/files/${data.path}`;
 	},
 	isValid:(obj)=>{
-		if(typeof obj.type =='undefined'||!['csv','json'].includes(obj.type.toLowerCase())) return false;
+		if(typeof obj.type =='undefined'||!['csv','json','yaml'].includes(obj.type.toLowerCase())) return false;
 		let mandatory=['ns','owner','repo','path'];
 		return mandatory.every(x=>x in obj&&obj[x]);
 	},

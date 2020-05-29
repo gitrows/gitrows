@@ -32,7 +32,7 @@
     },
     _parsePath: function _parsePath(path) {
       //@see: https://regex101.com/r/DwLNHW/5
-      var regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?::)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv))(?:\/([\w]+))?/mg;
+      var regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?::)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv|yaml))(?:\/([\w]+))?/mg;
       return GitPath._execRegex(regex, path);
     },
     _parseUrl: function _parseUrl(url) {
@@ -96,7 +96,7 @@
       return "https://".concat(data.server, "/api/v4/projects/").concat(data.project, "/repository/files/").concat(data.path);
     },
     isValid: function isValid(obj) {
-      if (typeof obj.type == 'undefined' || !['csv', 'json'].includes(obj.type.toLowerCase())) return false;
+      if (typeof obj.type == 'undefined' || !['csv', 'json', 'yaml'].includes(obj.type.toLowerCase())) return false;
       var mandatory = ['ns', 'owner', 'repo', 'path'];
       return mandatory.every(function (x) {
         return x in obj && obj[x];

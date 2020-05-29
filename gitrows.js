@@ -4,6 +4,7 @@ const CSV = {
 	parse:require('csv-parse/lib/sync'),
 	stringify: require('csv-stringify/lib/sync')
 };
+const YAML = require('yamljs');
 
 const Response=require('./lib/response.js');
 const Util=require('./lib/util.js');
@@ -65,7 +66,7 @@ module.exports=class Gitrows{
 					"branch":self.branch
 				};
 				if (typeof obj!='undefined'&&obj)
-					data.content=Util.btoa(self.type.toLowerCase()=='csv'?CSV.stringify(obj,{header:true}):JSON.stringify(obj));
+					data.content=Util.btoa(Gitrows._stringify(obj,self.type));
 				if (typeof sha!='undefined')
 					data.sha=sha;
 				let headers={
@@ -131,7 +132,7 @@ module.exports=class Gitrows{
 				}
 			)
 			.then(t=>{
-				let data=self.parseContent(t);
+				let data=Gitrows._parse(t,self.type);
 				if (data&&typeof query != 'undefined'){
 					data=Gitrows._applyFilters(data,query);
 				}
@@ -146,7 +147,7 @@ module.exports=class Gitrows{
 			self.pull(path)
 			.then(
 				d=>{
-					base=self.parseContent(Util.atob(d.content));
+					base=Gitrows._parse(Util.atob(d.content),self.type);
 					if (self.strict){
 						self.columns=self.columns||Util.columns(base);
 						data=Util.columnsApply(data,self.columns,self.default);
@@ -174,7 +175,7 @@ module.exports=class Gitrows{
 			self.pull(path)
 			.then(
 				d=>{
-					base=self.parseContent(Util.atob(d.content));
+					base=Gitrows._parse(Util.atob(d.content),self.type);
 					if (self.strict){
 						self.columns=self.columns||Util.columns(base);
 						base=Util.columnsApply(base,self.columns,self.default);
@@ -205,7 +206,7 @@ module.exports=class Gitrows{
 			self.pull(pathData)
 			.then(
 				d=>{
-					base=self.parseContent(Util.atob(d.content));
+					base=Gitrows._parse(Util.atob(d.content),self.type);
 					const diff=Util.where(base,query);
 					const data = base.filter(x => !diff.includes(x));
 					if (JSON.stringify(base) !== JSON.stringify(data))
@@ -217,7 +218,7 @@ module.exports=class Gitrows{
  	getColumns(path){
 		return this.get(path).then(data=>Util.columns(data));
 	}
-	parseContent(content){
+	/*parseContent(content){
 		let self=this;
 		let data=null;
 		try {
@@ -234,7 +235,7 @@ module.exports=class Gitrows{
 		} finally {
 			return data;
 		}
-	}
+	}*/
 	options(obj){
 		let self=this;
 		const allowed=['server','ns','owner','repo','branch','path','user','token','message','author','csv','type','columns','strict','default'];
@@ -261,5 +262,37 @@ module.exports=class Gitrows{
 		if(Object.keys(aggregates).length)
 			data=Util.aggregate(data,aggregates);
 			return data;
+	}
+	static _stringify(obj,type='json'){
+		try {
+			switch (type.toLowerCase()) {
+				case 'csv':
+					return Array.isArray(obj)?CSV.stringify(obj,{header:true}):null;
+					break;
+				case 'yaml':
+					return YAML.stringify(obj);
+					break;
+				default:
+					return JSON.stringify(obj);
+			}
+		} catch (e) {
+			return null;
+		}
+	}
+	static _parse(content,type='json'){
+		try {
+			switch (type.toLowerCase()) {
+				case 'csv':
+					return data=CSV.parse(content,{columns:true,skip_empty_lines:true});
+					break;
+				case 'yaml':
+					return YAML.parse(content);
+					break;
+				default:
+					return JSON.parse(content);
+			}
+		} catch (e) {
+			return null;
+		}
 	}
 }
