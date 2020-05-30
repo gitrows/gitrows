@@ -237,6 +237,22 @@ If you use the API style you may also append the `id` to the path and omit the s
 @namespace/owner/repository:branch/directory/file(.json|.csv)/id
 ```
 
+## types(path[, *object* {'$limit':'number'}])
+
+To get the columns and their data types which can be one of `string`, `number`, `integer`, `array` or `object`. The data types are detetced from the data set values. To speed detection up you can optionally pass a filter argument with the number of rows to be processed. If mixed values are found within a column, the following take precedence: `string` over `number` over `integer`.
+
+```js
+const limit = {'$limit':'10'};
+
+gitrows.types(path,limit)
+ .then((response)=>{
+  //handle response, which has the format (Object){columnName:'type'}
+ })
+ .catch((error)=>{
+  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
+ });
+```
+
 # Working with Files
 
 ## create(path[ ,data])
