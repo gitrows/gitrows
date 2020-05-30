@@ -215,8 +215,11 @@ module.exports=class Gitrows{
 			);
 		});
 	}
- 	getColumns(path){
+ 	columns(path){
 		return this.get(path).then(data=>Util.columns(data));
+	}
+	types(path,query){
+		return this.get(path,query).then(data=>Util.types(data));
 	}
 	options(obj){
 		let self=this;
@@ -262,10 +265,11 @@ module.exports=class Gitrows{
 		}
 	}
 	static _parse(content,type='json'){
+		type=type.toLowerCase();
 		try {
-			switch (type.toLowerCase()) {
+			switch (type) {
 				case 'csv':
-					return data=CSV.parse(content,{columns:true,skip_empty_lines:true});
+					return CSV.parse(content,{columns:true,skip_empty_lines:true,cast:true});
 					break;
 				case 'yaml':
 					return YAML.parse(content);
