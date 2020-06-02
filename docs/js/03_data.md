@@ -135,7 +135,7 @@ If you use the API style you may also append the `id` to the path and omit the s
 
 ## types(path[, *object* {'$limit':'number'}])
 
-To get the columns and their data types which can be one of `string`, `number`, `integer`, `array` or `object`. The data types are detetced from the data set values. To speed detection up you can optionally pass a filter argument with the number of rows to be processed. If mixed values are found within a column, the following take precedence: `string` over `number` over `integer`.
+Returns the columns and their data types which can be one of `string`, `number`, `integer`, `array` or `object`. The data types are detetced from the data set values. To speed detection up you can optionally pass a filter argument with the number of rows to be processed. If mixed values are found within a column, the following take precedence: `string` over `number` over `integer`.
 
 ```js
 const limit = {'$limit':'10'};

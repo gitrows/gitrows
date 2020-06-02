@@ -110,6 +110,8 @@ module.exports=class Gitrows{
 	}
 	get(path,query){
 		let self=this;
+		self._meta={};
+		self._data=null;
 		return new Promise(function(resolve, reject) {
 			const pathData=GitPath.parse(path)||{};
 			if (!pathData.path) reject(Response(400));
@@ -120,22 +122,31 @@ module.exports=class Gitrows{
 				query.id=pathData.resource;
 			}
 			const url=GitPath.toUrl(self.options(),true);
+			self._meta.repository={url:url,name:pathData.repo,owner:pathData.owner,ns:pathData.ns||'github'};
+			self._meta.file={type:pathData.type,mime:Util.mime(pathData.type)};
 			return fetch(url)
 			.then(
 				r=>{
-					if (r.ok) return r.text();
+					if (r.ok) {
+						self._meta.repository.private=false;
+						return r.text()
+					};
 					//retry by api if token is present
 					if (self.user!==undefined&&self.token!==undefined&&self.ns=='github'){
-						return self.pull(path).then(p=>Util.atob(p.content)).catch(e=>reject(e));
+						return self.pull(path).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
 					}
 					reject(Response(r.status));
 				}
 			)
 			.then(t=>{
 				let data=Gitrows._parse(t,self.type);
+				if (data)
+					self._meta.count={total:data.length||0};
 				if (data&&typeof query != 'undefined'){
 					data=Gitrows._applyFilters(data,query);
+					self._meta.count.query=data.length||0;
 				}
+				self._data=data;
 				resolve(data);
 			})
 			.catch(f=>console.log(f));
@@ -255,7 +266,7 @@ module.exports=class Gitrows{
 					return Array.isArray(obj)?CSV.stringify(obj,{header:true}):null;
 					break;
 				case 'yaml':
-					return YAML.stringify(obj);
+					return YAML.stringify(obj,10);
 					break;
 				default:
 					return JSON.stringify(obj);
