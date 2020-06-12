@@ -204,6 +204,18 @@ module.exports=class Gitrows{
 			);
 		});
 	}
+	replace(path,data){
+		let self=this,base=[],columns;
+		const pathData=GitPath.parse(path)||{};
+		return new Promise(function(resolve, reject) {
+			self.pull(path)
+			.then(
+				d=>{
+					self.push(path,data,d.sha).then(r=>resolve(Response(202))).catch(e=>e);
+				}
+			);
+		});
+	}
 	delete(path,query){
 		let self=this,base=[];
 		return new Promise(function(resolve, reject) {
@@ -269,7 +281,7 @@ module.exports=class Gitrows{
 					return YAML.stringify(obj,10);
 					break;
 				default:
-					return JSON.stringify(obj);
+					return JSON.stringify(obj,null,2);
 			}
 		} catch (e) {
 			return null;

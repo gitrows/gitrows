@@ -207,6 +207,26 @@ If you use the API style you may also append the `id` to the path and omit the s
 @namespace/owner/repository:branch/directory/file(.json|.csv)/id
 ```
 
+## replace(path, *object* data)
+> requires `token`
+
+To update a data set that is not representing tabular data but a dictionary, or to swap a complete set, use the replace method
+
+```js
+
+const data = {
+	foo: "bar"
+}
+
+gitrows.replace(path,data)
+ .then((response)=>{
+  //handle response, which has the format (Object){code:202,description='Accepted'} if successful or (Object){code:304,description='Not modified'}
+ })
+ .catch((error)=>{
+  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
+ });
+```
+
 ## delete(path[, *object* filter])
 > requires `token`
 
