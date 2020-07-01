@@ -294,10 +294,8 @@ module.exports=class Gitrows{
 	_pullOrFetch(url,method='fetch'){
 		let self=this;
 		if (method=='pull'){
-			console.log('pull');
 			return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
 		}
-		console.log('fetch');
 		return fetch(url)
 		.then(
 			r=>{
