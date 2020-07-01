@@ -108,7 +108,7 @@ module.exports=class Gitrows{
 				return self.pull(path).then(d=>self.push(path,null,d.sha,'DELETE'));
 		return self.push(path,null,null,'DELETE');
 	}
-	get(path,query){
+	get(path,query,method){
 		let self=this;
 		self._meta={};
 		self._data=null;
@@ -124,20 +124,7 @@ module.exports=class Gitrows{
 			const url=GitPath.toUrl(self.options(),true);
 			self._meta.repository={url:url,name:pathData.repo,owner:pathData.owner,ns:pathData.ns||'github'};
 			self._meta.file={type:pathData.type,mime:Util.mime(pathData.type)};
-			return fetch(url)
-			.then(
-				r=>{
-					if (r.ok) {
-						self._meta.repository.private=false;
-						return r.text()
-					};
-					//retry by api if token is present
-					if (self.user!==undefined&&self.token!==undefined&&self.ns=='github'){
-						return self.pull(path).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
-					}
-					reject(Response(r.status));
-				}
-			)
+			return self._pullOrFetch(url, method)
 			.then(t=>{
 				let data=Gitrows._parse(t,self.type);
 				if (data)
@@ -303,5 +290,27 @@ module.exports=class Gitrows{
 		} catch (e) {
 			return null;
 		}
+	}
+	_pullOrFetch(url,method='fetch'){
+		let self=this;
+		if (method=='pull'){
+			console.log('pull');
+			return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
+		}
+		console.log('fetch');
+		return fetch(url)
+		.then(
+			r=>{
+				if (r.ok) {
+					self._meta.repository.private=false;
+					return r.text()
+				};
+				//retry by api if token is present
+				if (self.user!==undefined&&self.token!==undefined&&self.ns=='github'){
+					return self.pull(path).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
+				}
+				reject(Response(r.status));
+			}
+		);
 	}
 }
