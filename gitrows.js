@@ -162,8 +162,7 @@ module.exports=class Gitrows{
 			.catch(f=>{
 				base=data;
 				self.push(path,base).then(r=>resolve(r)).catch(e=>reject(e));
-			})
-			.finally(resolve(Response(200)));
+			});
 		});
 	}
 	update(path,data,query){
@@ -305,7 +304,7 @@ module.exports=class Gitrows{
 				};
 				//retry by api if token is present
 				if (self.user!==undefined&&self.token!==undefined&&self.ns=='github'){
-					return self.pull(path).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
+					return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
 				}
 				reject(Response(r.status));
 			}
