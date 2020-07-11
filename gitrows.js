@@ -245,6 +245,21 @@ module.exports=class Gitrows{
 		}
 		return self;
 	}
+	_acl(path){
+		let self=this;
+		const pathData=GitPath.parse(path)||{};
+		if (!self.user||!self.token||!pathData.path)
+			return new Promise((resolve, reject)=>reject(Response(404)));
+		let headers={
+			'Content-Type': 'application/json',
+		};
+		headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
+		return fetch("https://api.github.com/repos/"+pathData.owner+'/'+pathData.repo,{headers:headers}).then(r=>{
+			if (!r.ok)
+			return Response(404);
+			return r.json().then(data=>{return{'private':data.private,'permissions':data.permissions}})
+		}).then(r=>r).catch(e=>e);
+	}
 	static _applyFilters(data,query){
 		data=Util.where(data,query);
 		let aggregates=Object.keys(query)

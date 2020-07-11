@@ -357,6 +357,8 @@ For simple matching if a value is present (e.g. an id) supply the field name and
 * `*:`		contains text, alias: `contains:`
 * `$:`		ends with, alias: `ends:`
 
+The string comparison is case insensitive.
+
 ## Aggregate Functions
 
 Instead of retrieving data entries you can use aggregate functions that are prefixed with the dollar sign `$` and followed by the column name:
