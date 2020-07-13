@@ -20,6 +20,8 @@ For simple matching if a value is present (e.g. an id) supply the field name and
 * `*:`		contains text, alias: `contains:`
 * `$:`		ends with, alias: `ends:`
 
+The string comparison is case insensitive.
+
 Example:
 
 ```

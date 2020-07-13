@@ -250,15 +250,58 @@ module.exports=class Gitrows{
 		const pathData=GitPath.parse(path)||{};
 		if (!self.user||!self.token||!pathData.path)
 			return new Promise((resolve, reject)=>reject(Response(404)));
+		if (pathData.ns!='github')
+			return new Promise((resolve, reject)=>reject(Response(501)));
 		let headers={
 			'Content-Type': 'application/json',
 		};
 		headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
 		return fetch("https://api.github.com/repos/"+pathData.owner+'/'+pathData.repo,{headers:headers}).then(r=>{
 			if (!r.ok)
-			return Response(404);
+				return Response(404);
 			return r.json().then(data=>{return{'private':data.private,'permissions':data.permissions}})
 		}).then(r=>r).catch(e=>e);
+	}
+	_listRepoContents(ns,owner,repo){
+		let self=this;
+		if (!self.user||!self.token)
+			return new Promise((resolve, reject)=>reject(Response(404)));
+		if (ns!='github')
+			return new Promise((resolve, reject)=>reject(Response(501)));
+		let headers={
+			'Content-Type': 'application/json',
+		};
+		headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
+		return fetch("https://api.github.com/repos/"+owner+'/'+repo+'/git/trees/master?recursive=1',{headers:headers}).then(r=>{
+			if (!r.ok)
+				return Response(404);
+			return r.json().then(data=>{
+				if (typeof data.tree =='undefined'||!Array.isArray(data.tree))
+					return Response(404);
+				let contents=[];
+				data.tree.forEach((item, i) => {
+					contents.push(item.path);
+				});
+				return contents;
+			})
+		}).then(r=>r).catch(e=>e);
+	}
+	_isRepoFile(path){
+		let self=this;
+		const pathData=GitPath.parse(path)||{};
+		if (!self.user||!self.token||!pathData.path)
+			return new Promise((resolve, reject)=>reject(Response(404)));
+		if (pathData.ns!='github')
+			return new Promise((resolve, reject)=>reject(Response(501)));
+		return self._listRepoContents(pathData.ns,pathData.owner,pathData.repo).then(c=>c.findIndex(item => pathData.path.toLowerCase() === item.toLowerCase())>-1).catch(e=>e);
+	}
+	_getRepoTree(ns,owner,repo){
+		let self=this;
+		return self._listRepoContents(ns,owner,repo).then(c=>{
+			let result={};
+			c.forEach(p => p.split('/').reduce((o, k) => o[k] = o[k] || {}, result));
+			return result;
+		}).catch(e=>e);
 	}
 	static _applyFilters(data,query){
 		data=Util.where(data,query);
