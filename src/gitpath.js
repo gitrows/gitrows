@@ -7,8 +7,8 @@ const GitPath={
 		return GitPath._parsePath(path);
 	},
 	_parsePath:(path)=>{
-		//@see: https://regex101.com/r/DwLNHW/5
-		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?::)([\w-]+))?)|(?:\.))\/([\w-\.\/]+\.(json|csv|yaml))(?:\/([\w]+))?/mg;
+		//@see: https://regex101.com/r/DwLNHW/7
+		const regex = /(?:(?:(?:(?:@)([\w\.]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?:#)([\w-]+))?)|(?:\.))(\/[\w-\/]+(?:\.(json|csv|yaml))?)(?:\/)?([\w]+)?/mg;
 		return GitPath._execRegex(regex,path);
 	},
 	_parseUrl:(url)=>{
