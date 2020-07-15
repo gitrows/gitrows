@@ -263,6 +263,12 @@ module.exports=class Gitrows{
 		}).then(r=>r).catch(e=>e);
 	}
 	_listRepoContents(ns,owner,repo){
+		let test=GitPath.parse(ns);
+		if (test.repo){
+			ns=test.ns;
+			owner=test.owner;
+			repo=test.repo;
+		}
 		let self=this;
 		if (!self.user||!self.token)
 			return new Promise((resolve, reject)=>reject(Response(404)));
@@ -351,7 +357,7 @@ module.exports=class Gitrows{
 	_pullOrFetch(url,method='fetch'){
 		let self=this;
 		if (method=='pull'){
-			return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
+			return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>e);
 		}
 		return fetch(url)
 		.then(
@@ -362,9 +368,9 @@ module.exports=class Gitrows{
 				};
 				//retry by api if token is present
 				if (self.user!==undefined&&self.token!==undefined&&self.ns=='github'){
-					return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>reject(e));
+					return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>e);
 				}
-				reject(Response(r.status));
+				return Response(r.status);
 			}
 		);
 	}
