@@ -14,6 +14,7 @@ module.exports=class Gitrows{
 	constructor(options){
 		this._defaults();
 		this.options(options);
+		this._cache={};
 	}
 	_defaults(){
 		const defaults={
@@ -25,6 +26,7 @@ module.exports=class Gitrows{
 			strict:false,
 			default:null
 		};
+		this._cache={};
 		Object.keys(this).forEach(key=>delete this[key]);
 		this.options(defaults);
 		return this;
@@ -245,42 +247,81 @@ module.exports=class Gitrows{
 		}
 		return self;
 	}
+	async test(path){
+		let result=GitPath.parse(path)||{};
+		if (!result.valid){
+			if (result.repo) result.fragment=true;
+			else return {...result,...Response(400)};
+		} else result.fragment=false;
+		const acl=await this._acl(path).then(r=>r).catch(e=>e);
+		result={...result,...acl};
+		if (acl.code) {
+			result.valid=false;
+			result.level='repo';
+			return result;
+		} else {
+			result.valid=result.fragment;
+		}
+		if (!result.fragment){
+			const file=await this._isRepoFile(path).then(r=>r).catch(e=>e);
+			result.valid=file===true;
+			result.level='file';
+			result={...result,...Response(file===true?200:404)};
+		}
+		return result;
+	}
 	_acl(path){
 		let self=this;
-		const pathData=GitPath.parse(path)||{};
-		if (!self.user||!self.token||!pathData.path)
-			return new Promise((resolve, reject)=>reject(Response(404)));
-		if (pathData.ns!='github')
-			return new Promise((resolve, reject)=>reject(Response(501)));
+		const test=GitPath.parse(path)||{};
+		if (!test.repo)
+			return Promise.reject(Response(404));
+		if (test.ns!='github')
+			return Promise.reject(Response(501));
+		const hash=`acl:${test.ns}:${test.owner}:${test.repo}`;
+		if (typeof self._cache[hash]!='undefined')
+			return new Promise((resolve, reject)=>self._cache[hash]?resolve(self._cache[hash]):reject(Response(404)));
 		let headers={
 			'Content-Type': 'application/json',
 		};
-		headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
-		return fetch("https://api.github.com/repos/"+pathData.owner+'/'+pathData.repo,{headers:headers}).then(r=>{
-			if (!r.ok)
+		if (self.user&&self.token)
+			headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
+		return fetch("https://api.github.com/repos/"+test.owner+'/'+test.repo,{headers:headers}).then(r=>{
+			if (!r.ok){
+				self._cache[hash]=null;
 				return Response(404);
-			return r.json().then(data=>{return{'private':data.private,'permissions':data.permissions}})
+			}
+			return r.json().then(data=>{
+				const acl={'private':data.private,'permissions':data.permissions};
+				self._cache[hash]=acl;
+				return acl;
+			})
 		}).then(r=>r).catch(e=>e);
 	}
 	_listRepoContents(ns,owner,repo){
+		let self=this;
 		let test=GitPath.parse(ns);
 		if (test.repo){
 			ns=test.ns;
 			owner=test.owner;
 			repo=test.repo;
 		}
-		let self=this;
-		if (!self.user||!self.token)
-			return new Promise((resolve, reject)=>reject(Response(404)));
+		if (!ns||!owner||!repo)
+			return Promise.reject(Response(400));
 		if (ns!='github')
-			return new Promise((resolve, reject)=>reject(Response(501)));
+			return Promise.reject(Response(501));
+		const hash=`files:${ns}:${owner}:${repo}`;
+		if (typeof self._cache[hash]!='undefined')
+			return new Promise((resolve, reject)=>self._cache[hash]?resolve(self._cache[hash]):reject(Response(404)));
 		let headers={
 			'Content-Type': 'application/json',
 		};
-		headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
+		if (self.user&&self.token)
+			headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
 		return fetch("https://api.github.com/repos/"+owner+'/'+repo+'/git/trees/master?recursive=1',{headers:headers}).then(r=>{
-			if (!r.ok)
+			if (!r.ok){
+				self._cache[hash]=null;
 				return Response(404);
+			}
 			return r.json().then(data=>{
 				if (typeof data.tree =='undefined'||!Array.isArray(data.tree))
 					return Response(404);
@@ -288,18 +329,19 @@ module.exports=class Gitrows{
 				data.tree.forEach((item, i) => {
 					contents.push(item.path);
 				});
+				self._cache[hash]=contents;
 				return contents;
 			})
 		}).then(r=>r).catch(e=>e);
 	}
 	_isRepoFile(path){
 		let self=this;
-		const pathData=GitPath.parse(path)||{};
-		if (!self.user||!self.token||!pathData.path)
-			return new Promise((resolve, reject)=>reject(Response(404)));
+		const test=GitPath.parse(path)||{};
+		/*if (!self.user||!self.token||!pathData.path)
+			return Promise.reject(Response(404));
 		if (pathData.ns!='github')
-			return new Promise((resolve, reject)=>reject(Response(501)));
-		return self._listRepoContents(pathData.ns,pathData.owner,pathData.repo).then(c=>c.findIndex(item => pathData.path.toLowerCase() === item.toLowerCase())>-1).catch(e=>e);
+			return Promise.reject(Response(501));*/
+		return self._listRepoContents(path).then(c=>c.findIndex(item => test.path.toLowerCase() === item.toLowerCase())>-1).catch(e=>e);
 	}
 	_getRepoTree(ns,owner,repo){
 		let self=this;

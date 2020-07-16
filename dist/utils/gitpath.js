@@ -31,8 +31,8 @@
       return GitPath._parsePath(path);
     },
     _parsePath: function _parsePath(path) {
-      //@see: https://regex101.com/r/DwLNHW/7
-      var regex = /^(?:(?:(?:(?:@)([\w]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?:#)([\w-]+))?)|(?:\.))([\w-\/]*(?:\.(json|csv|yaml))?)?(?:\/)?([\w]+)?$/mg;
+      //@see: https://regex101.com/r/DwLNHW/8
+      var regex = /^(?:(?:(?:(?:@)([\w]+)\/)?(?:([\w-]+)?\/)([\w-\.]+)(?:(?:#)([\w-]+))?)|(?:\.))\/?([\w-\/]*(?:\.(json|csv|yaml))?)?(?:\/)?([\w]+)?$/mg;
       return GitPath._execRegex(regex, path);
     },
     _parseUrl: function _parseUrl(url) {
