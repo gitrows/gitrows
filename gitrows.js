@@ -273,7 +273,10 @@ module.exports=class Gitrows{
 		Object.keys(constraint).forEach((item, i) => {
 			if (result[item]!==constraint[item]) {
 				result.valid=false;
-				result={...result,...Response(400,{description:`Constraint Violation - ${item} must not be ${result[item]}`})};
+				if (result.message)
+					result.message.description.push(`Constraint Violation - ${item} must not be ${result[item]}`);
+				else
+					result={...result,...Response(400,{description:[`Constraint Violation - ${item} must not be ${result[item]}`]})};
 			}
 		});
 		return result;
