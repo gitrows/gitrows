@@ -247,10 +247,10 @@ module.exports=class Gitrows{
 		}
 		return self;
 	}
-	async test(path){
+	async test(path,constraint={}){
 		let result=GitPath.parse(path)||{};
 		if (!result.valid){
-			if (result.repo) result.fragment=true;
+			if (result.repo&&constraint.fragment!==false&&constraint.file!==true) result.fragment=true;
 			else return {...result,...Response(400)};
 		} else result.fragment=false;
 		const acl=await this._acl(path).then(r=>r).catch(e=>e);
@@ -258,9 +258,11 @@ module.exports=class Gitrows{
 		if (acl.code) {
 			result.valid=false;
 			result.level='repo';
-			return result;
+			return {...result,...Response(acl.code)};
 		} else {
 			result.valid=result.fragment;
+			result={...result,...result.permissions};
+			delete(result.permissions);
 		}
 		if (!result.fragment){
 			const file=await this._isRepoFile(path).then(r=>r).catch(e=>e);
@@ -268,6 +270,12 @@ module.exports=class Gitrows{
 			result.level='file';
 			result={...result,...Response(file===true?200:404)};
 		}
+		Object.keys(constraint).forEach((item, i) => {
+			if (result[item]!==constraint[item]) {
+				result.valid=false;
+				result={...result,...Response(400,{description:`Constraint Violation - ${item} must not be ${result[item]}`})};
+			}
+		});
 		return result;
 	}
 	_acl(path){
