@@ -342,6 +342,85 @@ https://api.gitrows.com/@namespace/owner/repository:branch/path/file(.json|.csv|
 
 Give it a try with our sample database from the basic use example: `https://api.gitrows.com/@github/gitrows/data/iris.json` If you are unsure about how a file url is translated into API style, you can use GitRow's [Linter and Converter Tool](https://gitrows.com/linter) to check and translate repo and API paths respectively.
 
+## test(path [ ,constraint])
+
+To check the path (GitRows API or url) and your permissions, GitRows provides a test method. Please note that the `admin|push|pull` permissions will only be visible if you have provided your `token`.
+
+```js
+let path='@github/gitrows/data/countries.json'
+
+gitrows.test(path)
+ .then((response)=>{
+  //handle response, which has the format (Object){...resul}
+ })
+ .catch((error)=>{
+  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
+ });
+```
+
+This example would have a response like
+
+```
+{
+  valid: true,
+  ns: 'github',
+  owner: 'gitrows',
+  repo: 'data',
+  branch: undefined,
+  path: 'countries.json',
+  type: 'json',
+  resource: undefined,
+  fragment: false,
+  private: false,
+  admin: false,
+  push: false,
+  pull: true,
+  level: 'file',
+  code: 200,
+  message: { description: 'OK' }
+}
+```
+
+You can add optional constraints, e.g. to validate push access to the file:
+
+```js
+gitrows.test(path,{push:true})
+ .then((response)=>{
+  //handle response, which has the format (Object){...resul}
+ })
+ .catch((error)=>{
+  //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
+ });
+```
+
+which yields:
+
+```
+{
+  valid: false,
+  ns: 'github',
+  owner: 'gitrows',
+  repo: 'data',
+  branch: undefined,
+  path: 'countries.json',
+  type: 'json',
+  resource: undefined,
+  fragment: false,
+  private: false,
+  admin: false,
+  push: false,
+  pull: true,
+  level: 'file',
+  code: 400,
+  message: { description: 'Constraint Violation - push must not be false' }
+}
+```
+
+The test method also accepts fragments:
+
+- a repo `@github/gitrows/data`
+- a directory `@github/gitrows/data/dir`
+
 # Filters
 
 ## Filtering results
