@@ -273,7 +273,7 @@ module.exports=class Gitrows{
 		Object.keys(constraint).forEach((item, i) => {
 			if (result[item]!==constraint[item]) {
 				result.valid=false;
-				if (result.message)
+				if (result.message&&Array.isArray(result.message.description))
 					result.message.description.push(`Constraint Violation - ${item} must not be ${result[item]}`);
 				else
 					result={...result,...Response(400,{description:[`Constraint Violation - ${item} must not be ${result[item]}`]})};
@@ -348,10 +348,6 @@ module.exports=class Gitrows{
 	_isRepoFile(path){
 		let self=this;
 		const test=GitPath.parse(path)||{};
-		/*if (!self.user||!self.token||!pathData.path)
-			return Promise.reject(Response(404));
-		if (pathData.ns!='github')
-			return Promise.reject(Response(501));*/
 		return self._listRepoContents(path).then(c=>c.findIndex(item => test.path.toLowerCase() === item.toLowerCase())>-1).catch(e=>e);
 	}
 	_getRepoTree(ns,owner,repo){
