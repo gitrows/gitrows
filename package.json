@@ -34,11 +34,9 @@
   },
   "homepage": "https://github.com/gitrows/gitrows#readme",
   "dependencies": {
-    "core-js": "^2.6.11",
     "csv-parse": "^4.9.0",
     "csv-stringify": "^5.5.0",
     "node-fetch": "^2.6.0",
-    "regenerator-runtime": "^0.13.5",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
@@ -47,7 +45,6 @@
     "@babel/plugin-transform-modules-commonjs": "^7.9.6",
     "@babel/plugin-transform-modules-umd": "^7.9.0",
     "@babel/plugin-transform-named-capturing-groups-regex": "^7.8.3",
-    "@babel/plugin-transform-runtime": "^7.10.5",
     "@babel/preset-env": "^7.9.6",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.1.0",
