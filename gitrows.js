@@ -308,6 +308,35 @@ module.exports=class Gitrows{
 			})
 		}).then(r=>r).catch(e=>e);
 	}
+	_listPushableRepos(ns,owner){
+		const self=this;
+		if (ns&&typeof owner=='undefined');
+		[ns,owner]=ns.replace('@','').split('/');
+		if (!ns||!owner)
+			return Promise.reject(Response(400));
+		if (ns!='github')
+			return Promise.reject(Response(501));
+		if (!self.user||!self.token)
+			return Promise.reject(Response(403));
+		const hash=`repos:${ns}:${owner}`;
+		if (typeof self._cache[hash]!='undefined')
+			return new Promise((resolve, reject)=>self._cache[hash]?resolve(self._cache[hash]):reject(Response(404)));
+		let headers={
+			'Content-Type': 'application/json',
+			'Authorization': "Basic " + Util.btoa(self.user + ":" + self.token)
+		};
+		return fetch("https://api.github.com/user/repos?per_page=100",{headers:headers}).then(r=>{
+			if (!r.ok){
+				self._cache[hash]=null;
+				return Response(404);
+			}
+			return r.json().then(r=>{
+				let repos=r.filter(f=>f.permissions.push).map(r=>`@${ns}/${r.full_name}`);
+				self._cache[hash]=repos;
+				return repos;
+			})
+		}).then(r=>r).catch(e=>e);
+	}
 	_listRepoContents(ns,owner,repo){
 		let self=this;
 		let test=GitPath.parse(ns);
