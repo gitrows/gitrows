@@ -312,8 +312,6 @@ module.exports=class Gitrows{
 		const self=this;
 		if (ns&&typeof owner=='undefined');
 		[ns,owner]=ns.replace('@','').split('/');
-		if (!ns||!owner)
-			return Promise.reject(Response(400));
 		if (ns!='github')
 			return Promise.reject(Response(501));
 		if (!self.user||!self.token)
@@ -332,6 +330,7 @@ module.exports=class Gitrows{
 			}
 			return r.json().then(r=>{
 				let repos=r.filter(f=>f.permissions.push).map(r=>`@${ns}/${r.full_name}`);
+				if (typeof owner!='undefined') repos=repos.filter(r=>~r.indexOf(`@${ns}/${owner}/`));
 				self._cache[hash]=repos;
 				return repos;
 			})
