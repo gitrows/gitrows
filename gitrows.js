@@ -308,17 +308,20 @@ module.exports=class Gitrows{
 			})
 		}).then(r=>r).catch(e=>e);
 	}
-	_listPushableRepos(ns,owner){
+	_listPushableRepos(ns,owner,grouped){
 		const self=this;
 		if (typeof ns=='undefined')
 			return Promise.reject(Response(400));
-		if (typeof owner=='undefined');
-			[ns,owner]=ns.replace('@','').split('/');
+		ns=ns.replace('@','');
+		if (typeof owner=='undefined')
+			[ns,owner]=ns.split('/');
 		if (ns!='github')
 			return Promise.reject(Response(400));
 		if (!self.user||!self.token)
 			return Promise.reject(Response(403));
-		const hash=`repos:${ns}:${owner}`;
+		console.log(ns,owner,grouped);
+		const hash=`repos:${ns}:${owner}:${!!grouped}`;
+		console.log(hash);
 		if (typeof self._cache[hash]!='undefined')
 			return new Promise((resolve, reject)=>self._cache[hash]?resolve(self._cache[hash]):reject(Response(404)));
 		let headers={
@@ -331,7 +334,19 @@ module.exports=class Gitrows{
 				return Response(404);
 			}
 			return r.json().then(r=>{
-				let repos=r.filter(f=>f.permissions.push).map(r=>`@${ns}/${r.full_name}`);
+				self._cache[`raw:repos:${ns}:${owner}`]=r;
+				let repos;
+				if (!!grouped){
+					repos={};
+					r.map(i=>repos[i.owner.login]={avatar:i.owner.avatar_url,type:i.owner.type,login:i.owner.login});
+					Object.keys(repos).forEach((item, i) => {
+						repos[item]['repos']=r.filter(f=>f.permissions.push&&f.owner.login==item).map(r=>`@${ns}/${r.full_name}`);
+					});
+					repos=(typeof owner!='undefined')?repos[owner]:repos;
+					self._cache[hash]=repos;
+					return repos;
+				}
+				repos=r.filter(f=>f.permissions.push).map(r=>`@${ns}/${r.full_name}`);
 				if (typeof owner!='undefined') repos=repos.filter(r=>~r.indexOf(`@${ns}/${owner}/`));
 				self._cache[hash]=repos;
 				return repos;
