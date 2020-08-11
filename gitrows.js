@@ -310,10 +310,12 @@ module.exports=class Gitrows{
 	}
 	_listPushableRepos(ns,owner){
 		const self=this;
-		if (ns&&typeof owner=='undefined');
-		[ns,owner]=ns.replace('@','').split('/');
+		if (typeof ns=='undefined')
+			return Promise.reject(Response(400));
+		if (typeof owner=='undefined');
+			[ns,owner]=ns.replace('@','').split('/');
 		if (ns!='github')
-			return Promise.reject(Response(501));
+			return Promise.reject(Response(400));
 		if (!self.user||!self.token)
 			return Promise.reject(Response(403));
 		const hash=`repos:${ns}:${owner}`;
