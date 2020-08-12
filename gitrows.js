@@ -319,9 +319,7 @@ module.exports=class Gitrows{
 			return Promise.reject(Response(400));
 		if (!self.user||!self.token)
 			return Promise.reject(Response(403));
-		console.log(ns,owner,grouped);
 		const hash=`repos:${ns}:${owner}:${!!grouped}`;
-		console.log(hash);
 		if (typeof self._cache[hash]!='undefined')
 			return new Promise((resolve, reject)=>self._cache[hash]?resolve(self._cache[hash]):reject(Response(404)));
 		let headers={
