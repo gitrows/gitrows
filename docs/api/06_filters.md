@@ -28,6 +28,12 @@ Example:
 https://api.gitrows.com/@github/gitrows/data/iris.json?petalLength=lt:1.5
 ```
 
+You can also supply multiple expressions and values per field name. All expressions will be handled as logical `AND`. This is especially useful for selecting ranges:
+
+```
+https://api.gitrows.com/@github/gitrows/data/iris.json?petalLength=lt:1.5&petalLength=gt:1
+```
+
 ## Aggregate Functions
 
 Instead of retrieving data entries you can use aggregate functions that are prefixed with the dollar sign `$` and followed by the column name:

@@ -438,6 +438,16 @@ For simple matching if a value is present (e.g. an id) supply the field name and
 
 The string comparison is case insensitive.
 
+```js
+gitrows.get(path,{'some_numerical_field':'gt:10'});
+```
+
+You can also supply an array of expressions per field name. All expressions will be handled as logical `AND`. This is especially useful for selecting ranges:
+
+```js
+gitrows.get(path,{'some_numerical_field':['gt:10','lt:20']});
+```
+
 ## Aggregate Functions
 
 Instead of retrieving data entries you can use aggregate functions that are prefixed with the dollar sign `$` and followed by the column name:
