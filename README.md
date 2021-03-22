@@ -145,7 +145,7 @@ For adding or updating data (and deleting or creating new data files) you must s
 
 ```js
 const options = {
- username:"yourUsername",
+ user:"yourUsername",
  token:"yourSecretToken"
 };
 
