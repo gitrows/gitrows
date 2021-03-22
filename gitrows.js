@@ -351,13 +351,14 @@ module.exports=class Gitrows{
 			})
 		}).then(r=>r).catch(e=>e);
 	}
-	_listRepoContents(ns,owner,repo){
+	_listRepoContents(ns,owner,repo,branch){
 		let self=this;
 		let test=GitPath.parse(ns);
 		if (test.repo){
 			ns=test.ns;
 			owner=test.owner;
 			repo=test.repo;
+			branch=test.branch;
 		}
 		if (!ns||!owner||!repo)
 			return Promise.reject(Response(400));
@@ -371,7 +372,7 @@ module.exports=class Gitrows{
 		};
 		if (self.user&&self.token)
 			headers['Authorization']="Basic " + Util.btoa(self.user + ":" + self.token);
-		return fetch("https://api.github.com/repos/"+owner+'/'+repo+'/git/trees/master?recursive=1',{headers:headers}).then(r=>{
+		return fetch("https://api.github.com/repos/"+owner+'/'+repo+'/git/trees/'+branch+'?recursive=1',{headers:headers}).then(r=>{
 			if (!r.ok){
 				self._cache[hash]=null;
 				return Response(404);
@@ -393,9 +394,9 @@ module.exports=class Gitrows{
 		const test=GitPath.parse(path)||{};
 		return self._listRepoContents(path).then(c=>c.findIndex(item => test.path.toLowerCase() === item.toLowerCase())>-1).catch(e=>e);
 	}
-	_getRepoTree(ns,owner,repo){
+	_getRepoTree(ns,owner,repo,branch){
 		let self=this;
-		return self._listRepoContents(ns,owner,repo).then(c=>{
+		return self._listRepoContents(ns,owner,repo,branch).then(c=>{
 			let result={};
 			c.forEach(p => p.split('/').reduce((o, k) => o[k] = o[k] || {}, result));
 			return result;

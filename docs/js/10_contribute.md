@@ -18,3 +18,6 @@ You can reach me at <nicolas@gitrows.com>
 
 Copyright © 2020, [Nicolas Zimmer](https://github.com/nicolaszimmer).
 [MIT](LICENSE)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgitrows%2Fgitrows.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgitrows%2Fgitrows?ref=badge_large)
