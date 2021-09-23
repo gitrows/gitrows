@@ -98,7 +98,8 @@ The commits are done with a standard message and authored by GitRows by default.
 
 You can set these output options:
 
-* `csv`	the option accepts only an object with the property `delimiter`, others might be added in future versions
+* `csv`	the option accepts an object that is passed to `CSV.stringify`. [See the available options](https://csv.js.org/stringify/options/).
+only an object with the property `delimiter`, others might be added in future versions
 * `type`	either `json` or `csv` - in most cases there is no need to set this as GitRows determines the type by the data file extension and by parsing its content, but might be useful for debugging purposes
 * `columns` either determined by the data file entries or set as an `Array` with the column names - only applied if `strict` is `true`
 * `strict` if set to `true` GitRows will enforce the column scheme found in the data file or set by the columns option for all added data entries
@@ -172,9 +173,9 @@ gitrows.put(path,data)
  });
 ```
 
-GitRows accepts the data as an `Array` of `Objects` if you want to add one ore more entries (rows) or a single `Object` for appending one entry (row).
+GitRows accepts the data as an `Array` of `Objects` if you want to add one or more entries (rows) or a single `Object` for appending one entry (row).
 
-If you want to enforce consistent data structures, set `options({strict:true})`. If true, GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`. You can also set the columns as an option with `options({columns:[]})`.
+If you want to enforce consistent data structures set `options({strict:true})`. If true, GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`. You can also set the columns as an option with `options({columns:[]})`.
 
 ## update(path, *object* data[, *object* filter])
 > requires `token`
