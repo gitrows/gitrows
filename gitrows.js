@@ -68,7 +68,7 @@ module.exports=class Gitrows{
 					"branch":self.branch
 				};
 				if (typeof obj!='undefined'&&obj)
-					data.content=Util.btoa(Gitrows._stringify(obj,self.type));
+					data.content=Util.btoa(Gitrows._stringify(obj,self.type,self.csv));
 				if (typeof sha!='undefined')
 					data.sha=sha;
 				let headers={
@@ -414,11 +414,11 @@ module.exports=class Gitrows{
 			data=Util.aggregate(data,aggregates);
 			return data;
 	}
-	static _stringify(obj,type='json'){
+	static _stringify(obj,type='json',options={}){
 		try {
 			switch (type.toLowerCase()) {
 				case 'csv':
-					return Array.isArray(obj)?CSV.stringify(obj,{header:true}):null;
+					return Array.isArray(obj)?CSV.stringify(obj,Object.assign({header:true},options)):null;
 					break;
 				case 'yaml':
 					return YAML.stringify(obj,10);
