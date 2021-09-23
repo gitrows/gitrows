@@ -137,7 +137,7 @@ The `get` method accepts as a second argument a filter object which can be used 
 
 **For reading a file from a private repo you must set your username and token (see put() for more details). Please note that its impossible to decide from the returned status code if the file is private on GitHub or not, as it will always be 404 by GitHub's policy.**
 
-As a third parameter you can set the mechanism for retrieving data from the repository server. It defaults to `fetch` which is sufficent for most use cases and avoids rate limit issues. However, as `fetch` uses the html `raw` endpoints, e.g. `https://https://raw.githubusercontent.com/`, this may lead to a caching latency of a few seconds. If your use case requires faster access times, try `pull` instead which queries the GitHub or GitLab content APIs.
+As a third parameter you can set the mechanism for retrieving data from the repository server. It defaults to `fetch` which is sufficent for most use cases and avoids rate limit issues. However, as `fetch` uses the html `raw` endpoints, e.g. `https://raw.githubusercontent.com/`, this may lead to a caching latency of a few seconds. If your use case requires faster access times, try `pull` instead which queries the GitHub or GitLab content APIs.
 
 ## put(path, *object* data)
 > requires `token`
@@ -180,7 +180,7 @@ If you want to enforce consistent data structures set `options({strict:true})`. 
 ## update(path, *object* data[, *object* filter])
 > requires `token`
 
-To update an entry from data you must provide it's `id`, which may either be
+To update an entry from data you must provide its `id`, which may either be
 
 * the entry's `id property`, if the data consists of an `Array` of `Objects`, e.g. `[{id:'0001', foo:'bar'}]`
 * the `property name`, if the data consists of a single `Object`
@@ -234,7 +234,7 @@ gitrows.replace(path,data)
 ## delete(path[, *object* filter])
 > requires `token`
 
-To delete an entry from data you must provide it's `id`, which may either be
+To delete an entry from data you must provide its `id`, which may either be
 
 * the entry's `id property`, if the data consists of an `Array` of `Objects`, e.g. `[{id:'0001', foo:'bar'}]`
 * the `property name`, if the data consists of a single `Object`
@@ -336,7 +336,7 @@ Although it's easier for a simple query to just paste the url I strongly encoura
 ./directory/file(.json|.csv|.yaml)
 ```
 
-The API style got it's name from its use with the free GitRows API tool which allows you to query all public repos with a consistent api call:
+The API style got its name from its use with the free GitRows API tool which allows you to query all public repos with a consistent api call:
 
 ```
 https://api.gitrows.com/@namespace/owner/repository:branch/path/file(.json|.csv|.yaml)
@@ -353,7 +353,7 @@ let path='@github/gitrows/data/countries.json'
 
 gitrows.test(path)
  .then((response)=>{
-  //handle response, which has the format (Object){...resul}
+  //handle response, which has the format (Object){...result}
  })
  .catch((error)=>{
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
@@ -388,7 +388,7 @@ You can add optional constraints, e.g. to validate push access to the file:
 ```js
 gitrows.test(path,{push:true})
  .then((response)=>{
-  //handle response, which has the format (Object){...resul}
+  //handle response, which has the format (Object){...result}
  })
  .catch((error)=>{
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
