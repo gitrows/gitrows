@@ -36,7 +36,7 @@
   "dependencies": {
     "csv-parse": "^4.12.0",
     "csv-stringify": "^5.5.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
