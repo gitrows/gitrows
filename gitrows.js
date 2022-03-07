@@ -35,7 +35,7 @@ module.exports=class Gitrows{
 		return this._defaults();
 	}
 	pull(path){
-		let self=this;
+		let self = this;
 		return new Promise(function(resolve, reject) {
 			let headers={};
 			const pathData=GitPath.parse(path)||{};
@@ -448,7 +448,7 @@ module.exports=class Gitrows{
 		}
 	}
 	_pullOrFetch(url,method='fetch'){
-		let self=this;
+		let self = this;
 		if (method=='pull'){
 			return self.pull(GitPath.fromUrl(url)).then(p=>{self._meta.repository.private=true;return Util.atob(p.content)}).catch(e=>e);
 		}
