@@ -19,7 +19,7 @@ module.exports=class Gitrows{
 	_defaults(){
 		const defaults={
 			ns:'github',
-			branch:'master',
+			branch:'HEAD',
 			message:'GitRows API Post (https://gitrows.com)',
 			author:{name:"GitRows",email:"api@gitrows.com"},
 			csv:{delimiter:","},
