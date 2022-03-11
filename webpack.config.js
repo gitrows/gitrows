@@ -29,9 +29,12 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.jsx'],
+    fallback: {
+      "stream": require.resolve("stream-browserify"),
+      "string_decoder": require.resolve("string_decoder/"),
+      "buffer": require.resolve("buffer/"),
+      fs: false
+    }
   },
   mode: 'production',
-	node: {
-  	fs: 'empty'
-	}
 };

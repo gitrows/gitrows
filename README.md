@@ -60,7 +60,7 @@ You can use the `options()` method to set or get the options of the GitRows inst
   ns: 'github',
   owner: undefined,
   repo: undefined,
-  branch: 'master',
+  branch: 'HEAD',
   path: undefined,
   user: undefined,
   token: undefined,
@@ -81,7 +81,7 @@ The following options are data file repository related and may be overwritten by
 * `ns`	either `github` or `gitlab`
 * `owner`	repository owner
 * `repo`	repository name
-* `branch` select another than `master`
+* `branch` select another than `HEAD`
 * `path`	directory and/or file name with extension
 
 If you want to alter the contents of the data files you need to provide a username and access token for the selected namespace:
@@ -98,8 +98,7 @@ The commits are done with a standard message and authored by GitRows by default.
 
 You can set these output options:
 
-* `csv`	the option accepts an object that is passed to `CSV.stringify`. [See the available options](https://csv.js.org/stringify/options/).
-only an object with the property `delimiter`, others might be added in future versions
+* `csv`	the option accepts only an object with the property `delimiter`, others might be added in future versions
 * `type`	either `json` or `csv` - in most cases there is no need to set this as GitRows determines the type by the data file extension and by parsing its content, but might be useful for debugging purposes
 * `columns` either determined by the data file entries or set as an `Array` with the column names - only applied if `strict` is `true`
 * `strict` if set to `true` GitRows will enforce the column scheme found in the data file or set by the columns option for all added data entries
@@ -137,7 +136,7 @@ The `get` method accepts as a second argument a filter object which can be used 
 
 **For reading a file from a private repo you must set your username and token (see put() for more details). Please note that its impossible to decide from the returned status code if the file is private on GitHub or not, as it will always be 404 by GitHub's policy.**
 
-As a third parameter you can set the mechanism for retrieving data from the repository server. It defaults to `fetch` which is sufficent for most use cases and avoids rate limit issues. However, as `fetch` uses the html `raw` endpoints, e.g. `https://raw.githubusercontent.com/`, this may lead to a caching latency of a few seconds. If your use case requires faster access times, try `pull` instead which queries the GitHub or GitLab content APIs.
+As a third parameter you can set the mechanism for retrieving data from the repository server. It defaults to `fetch` which is sufficent for most use cases and avoids rate limit issues. However, as `fetch` uses the html `raw` endpoints, e.g. `https://https://raw.githubusercontent.com/`, this may lead to a caching latency of a few seconds. If your use case requires faster access times, try `pull` instead which queries the GitHub or GitLab content APIs.
 
 ## put(path, *object* data)
 > requires `token`
@@ -146,7 +145,7 @@ For adding or updating data (and deleting or creating new data files) you must s
 
 ```js
 const options = {
- user:"yourUsername",
+ username:"yourUsername",
  token:"yourSecretToken"
 };
 
@@ -173,14 +172,14 @@ gitrows.put(path,data)
  });
 ```
 
-GitRows accepts the data as an `Array` of `Objects` if you want to add one or more entries (rows) or a single `Object` for appending one entry (row).
+GitRows accepts the data as an `Array` of `Objects` if you want to add one ore more entries (rows) or a single `Object` for appending one entry (row).
 
-If you want to enforce consistent data structures set `options({strict:true})`. If true, GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`. You can also set the columns as an option with `options({columns:[]})`.
+To if you want to enforce consistent data structures set `options({strict:true})`. If true, GitRows will check the columns (keys) used in your datafile and add the missing keys with the default value `NULL` or any other value you set with `options({default:''})`. You can also set the columns as an option with `options({columns:[]})`.
 
 ## update(path, *object* data[, *object* filter])
 > requires `token`
 
-To update an entry from data you must provide its `id`, which may either be
+To update an entry from data you must provide it's `id`, which may either be
 
 * the entry's `id property`, if the data consists of an `Array` of `Objects`, e.g. `[{id:'0001', foo:'bar'}]`
 * the `property name`, if the data consists of a single `Object`
@@ -234,7 +233,7 @@ gitrows.replace(path,data)
 ## delete(path[, *object* filter])
 > requires `token`
 
-To delete an entry from data you must provide its `id`, which may either be
+To delete an entry from data you must provide it's `id`, which may either be
 
 * the entry's `id property`, if the data consists of an `Array` of `Objects`, e.g. `[{id:'0001', foo:'bar'}]`
 * the `property name`, if the data consists of a single `Object`
@@ -336,7 +335,7 @@ Although it's easier for a simple query to just paste the url I strongly encoura
 ./directory/file(.json|.csv|.yaml)
 ```
 
-The API style got its name from its use with the free GitRows API tool which allows you to query all public repos with a consistent api call:
+The API style got it's name from its use with the free GitRows API tool which allows you to query all public repos with a consistent api call:
 
 ```
 https://api.gitrows.com/@namespace/owner/repository:branch/path/file(.json|.csv|.yaml)
@@ -353,7 +352,7 @@ let path='@github/gitrows/data/countries.json'
 
 gitrows.test(path)
  .then((response)=>{
-  //handle response, which has the format (Object){...result}
+  //handle response, which has the format (Object){...resul}
  })
  .catch((error)=>{
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}
@@ -388,7 +387,7 @@ You can add optional constraints, e.g. to validate push access to the file:
 ```js
 gitrows.test(path,{push:true})
  .then((response)=>{
-  //handle response, which has the format (Object){...result}
+  //handle response, which has the format (Object){...resul}
  })
  .catch((error)=>{
   //handle error, which has the format (Object){code:http_status_code,description='http_status_description'}

@@ -60,7 +60,7 @@
 
       if (!GitPath.isValid(data)) return null;
       data.branch = data.branch && data.branch != 'master' ? ':' + data.branch : '';
-      return "@".concat(data.ns, "/").concat(data.owner, "/").concat(data.repo).concat(data.branch, "/").concat(data.path);
+      return `@${data.ns}/${data.owner}/${data.repo}${data.branch}/${data.path}`;
     },
     toUrl: (path, raw = false) => {
       let data = typeof path == 'object' ? path : GitPath.parse(path);
@@ -70,12 +70,12 @@
       if (!data.ns || data.ns == 'github') {
         data.server = raw ? 'raw.githubusercontent.com' : 'github.com';
         data.format = raw ? '' : 'blob/';
-        return "https://".concat(data.server, "/").concat(data.owner, "/").concat(data.repo, "/").concat(data.format + data.branch, "/").concat(data.path);
+        return `https://${data.server}/${data.owner}/${data.repo}/${data.format + data.branch}/${data.path}`;
       }
 
       data.server = data.server || 'gitlab.com';
       data.format = raw ? 'raw' : 'blob';
-      return "https://".concat(data.server, "/").concat(data.owner, "/").concat(data.repo, "/-/").concat(data.format, "/").concat(data.branch, "/").concat(data.path);
+      return `https://${data.server}/${data.owner}/${data.repo}/-/${data.format}/${data.branch}/${data.path}`;
     },
     toApi: path => {
       let data = typeof path == 'object' ? path : GitPath.parse(path);
@@ -83,13 +83,13 @@
 
       if (!data.ns || data.ns == 'github') {
         data.server = 'api.github.com';
-        return "https://".concat(data.server, "/repos/").concat(data.owner, "/").concat(data.repo, "/contents/").concat(data.path);
+        return `https://${data.server}/repos/${data.owner}/${data.repo}/contents/${data.path}`;
       }
 
       data.server = data.server || 'gitlab.com';
       data.project = encodeURIComponent(data.owner + '/' + data.repo);
       data.path = encodeURIComponent(data.path);
-      return "https://".concat(data.server, "/api/v4/projects/").concat(data.project, "/repository/files/").concat(data.path);
+      return `https://${data.server}/api/v4/projects/${data.project}/repository/files/${data.path}`;
     },
     isValid: obj => {
       if (typeof obj.type == 'undefined' || !['csv', 'json', 'yaml'].includes(obj.type.toLowerCase())) return false;

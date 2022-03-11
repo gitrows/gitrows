@@ -12,7 +12,7 @@ You can use the `options()` method to set or get the options of the GitRows inst
   ns: 'github',
   owner: undefined,
   repo: undefined,
-  branch: 'master',
+  branch: 'HEAD',
   path: undefined,
   user: undefined,
   token: undefined,
@@ -33,7 +33,7 @@ The following options are data file repository related and may be overwritten by
 * `ns`	either `github` or `gitlab`
 * `owner`	repository owner
 * `repo`	repository name
-* `branch` select another than `master`
+* `branch` select another than `HEAD`
 * `path`	directory and/or file name with extension
 
 If you want to alter the contents of the data files you need to provide a username and access token for the selected namespace:
