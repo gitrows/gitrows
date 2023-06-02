@@ -114,7 +114,7 @@ GitRows implements a full CRUD interface to you data so you can create, read, up
 To read the complete data set from a `.json` or `.csv` file you pass the file path to the `.get()` method, which has the basic structure of
 
 ```
-@namespace/owner/repository:branch/directory/file(.json|.csv)
+@namespace/owner/repository#branch/directory/file(.json|.csv)
 ```
 
 Alternatively you can copy the file url form your browser and pass this instead. Read more about the path structure and how to troubleshoot in the [Path section](#path) of GitRows' documentation.
@@ -207,7 +207,7 @@ gitrows.update(path,data,filter)
 If you use the API style you may also append the `id` to the path and omit the second argument:
 
 ```
-@namespace/owner/repository:branch/directory/file(.json|.csv)/id
+@namespace/owner/repository#branch/directory/file(.json|.csv)/id
 ```
 
 ## replace(path, *object* data)
@@ -257,7 +257,7 @@ gitrows.delete(path,filter)
 If you use the API style you may also append the `id` to the path and omit the second argument:
 
 ```
-@namespace/owner/repository:branch/directory/file(.json|.csv)/id
+@namespace/owner/repository#branch/directory/file(.json|.csv)/id
 ```
 
 ## types(path[, *object* {'$limit':'number'}])
@@ -321,10 +321,10 @@ https://github.com/gitrows/data/blob/master/iris.json
 or use the GitRows API style:
 
 ```
-@namespace/owner/repository:branch/directory/file(.json|.csv|.yaml)
+@namespace/owner/repository#branch/directory/file(.json|.csv|.yaml)
 ```
 
-`@namespace` and `:branch` are optional and default to `github` and `master`, if you want to access a GitLab repository, use the `gitlab` namespace.
+`@namespace` and `#branch` are optional and default to `github` and `master`, if you want to access a GitLab repository, use the `gitlab` namespace.
 
 
 ## Which notation to use?
@@ -338,7 +338,7 @@ Although it's easier for a simple query to just paste the url I strongly encoura
 The API style got it's name from its use with the free GitRows API tool which allows you to query all public repos with a consistent api call:
 
 ```
-https://api.gitrows.com/@namespace/owner/repository:branch/path/file(.json|.csv|.yaml)
+https://api.gitrows.com/@namespace/owner/repository#branch/path/file(.json|.csv|.yaml)
 ```
 
 Give it a try with our sample database from the basic use example: `https://api.gitrows.com/@github/gitrows/data/iris.json` If you are unsure about how a file url is translated into API style, you can use GitRow's [Linter and Converter Tool](https://gitrows.com/linter) to check and translate repo and API paths respectively.
